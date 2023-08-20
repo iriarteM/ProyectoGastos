@@ -1250,7 +1250,7 @@ boton_limpiar.grid(row=8, column=2, columnspan=2, padx=(5, 15), pady=(0, 11), st
 
 #######################################################################################################################
 # FRAME REPORTE #
-frame_reporte = ttk.LabelFrame(frame, text="Reporte")
+frame_reporte = ttk.LabelFrame(frame, text="Resumen de Gastos")
 frame_reporte.grid(row=2, column=0, columnspan=2, padx=(30, 0), pady=(5, 30), sticky="nw")
 
 frame_total = ttk.Frame(frame_reporte)
@@ -1263,43 +1263,35 @@ notebook = ttk.Notebook(frame_total)
 tab_1 = ttk.Frame(notebook)
 notebook.add(tab_1, text="Gastos")
 
-label_usuario_gastador = ttk.Label(tab_1, text="Usuario con más gastos:")
-label_usuario_gastador.grid(row=0, column=0, padx=(15, 0), pady=(10, 0), sticky="w")
+label_gasto_mes = ttk.Label(tab_1, text="Gasto del Mes Actual:")
+label_gasto_mes.grid(row=0, column=0, padx=(15, 0), pady=(10, 0), sticky="nsew")
+entry_gasto_mes = ttk.Entry(tab_1, state="disabled", width=20)
+entry_gasto_mes.grid(row=1, column=0, padx=(15, 0), pady=(0, 15), sticky="nsew")
 
-entry_usuario_gastador = ttk.Entry(tab_1, state="disabled", width=20)
-entry_usuario_gastador.grid(row=1, column=0, padx=(15, 0), pady=(0, 0), sticky="w")
+label_gasto_mes_promedio = ttk.Label(tab_1, text="Gasto Mensual Promedio:")
+label_gasto_mes_promedio.grid(row=0, column=1, padx=(20, 15), pady=(10, 0), sticky="nsew")
+entry_gasto_mes_promedio = ttk.Entry(tab_1, state="disabled", width=20)
+entry_gasto_mes_promedio.grid(row=1, column=1, padx=(20, 15), pady=(0, 15), sticky="nsew")
 
-label_usuario_frecuente = ttk.Label(tab_1, text="Usuario más frecuente:")
-label_usuario_frecuente.grid(row=0, column=1, padx=(20, 15), pady=(12, 0), sticky="w")
+label_gasto_año = ttk.Label(tab_1, text="Gasto del Año Actual:")
+label_gasto_año.grid(row=2, column=0, padx=(15, 0), pady=(10, 0), sticky="nsew")
+entry_gasto_año = ttk.Entry(tab_1, state="disabled", width=20)
+entry_gasto_año.grid(row=3, column=0, padx=(15, 0), pady=(0, 15), sticky="nsew")
 
-entry_usuario_frecuente = ttk.Entry(tab_1, state="disabled", width=20)
-entry_usuario_frecuente.grid(row=1, column=1, padx=(20, 15), pady=(0, 0), sticky="w")
+label_gasto_año_promedio = ttk.Label(tab_1, text="Gasto Anual Promedio:")
+label_gasto_año_promedio.grid(row=2, column=1, padx=(20, 15), pady=(10, 0), sticky="nsew")
+entry_gasto_año_promedio = ttk.Entry(tab_1, state="disabled", width=20)
+entry_gasto_año_promedio.grid(row=3, column=1, padx=(20, 15), pady=(0, 15), sticky="nsew")
 
-
-label_banco_gastador = ttk.Label(tab_1, text="Banco con más gastos:")
-label_banco_gastador.grid(row=2, column=0, padx=(15, 0), pady=(11, 0), sticky="w")
-
-entry_label_banco_gastador = ttk.Entry(tab_1, state="disabled", width=20)
-entry_label_banco_gastador.grid(row=3, column=0, padx=(15, 0), pady=(0, 0), sticky="w")
-
-label_banco_frecuente = ttk.Label(tab_1, text="Banco más frecuente:")
-label_banco_frecuente.grid(row=2, column=1, padx=(20, 15), pady=(11, 0), sticky="w")
-
-entry_label_banco_frecuente = ttk.Entry(tab_1, state="disabled", width=20)
-entry_label_banco_frecuente.grid(row=3, column=1, padx=(20, 15), pady=(0, 0), sticky="w")
-
-
-label_estable_gastador = ttk.Label(tab_1, text="Estab. con más gastos:")
-label_estable_gastador.grid(row=4, column=0, padx=(15, 0), pady=(11, 0), sticky="w")
-
+label_estable_gastador = ttk.Label(tab_1, text="Gasto Más Alto (Mes):")
+label_estable_gastador.grid(row=4, column=0, padx=(15, 0), pady=(10, 0), sticky="nsew")
 entry_estable_gastador = ttk.Entry(tab_1, state="disabled", width=20)
-entry_estable_gastador.grid(row=5, column=0, padx=(15, 0), pady=(0, 0), sticky="w")
+entry_estable_gastador.grid(row=5, column=0, padx=(15, 0), pady=(0, 15), sticky="nsew")
 
-label_estable_frecuente = ttk.Label(tab_1, text="Estab. más frecuente:")
-label_estable_frecuente.grid(row=4, column=1, padx=(20, 15), pady=(11, 0), sticky="w")
-
+label_estable_frecuente = ttk.Label(tab_1, text="Gasto Más Bajo (Mes):")
+label_estable_frecuente.grid(row=4, column=1, padx=(20, 15), pady=(10, 0), sticky="nsew")
 entry_estable_frecuente = ttk.Entry(tab_1, state="disabled", width=20)
-entry_estable_frecuente.grid(row=5, column=1, padx=(20, 15), pady=(0, 0), sticky="w")
+entry_estable_frecuente.grid(row=5, column=1, padx=(20, 15), pady=(0, 15), sticky="nsew")
 
 # Tab #2
 tab_2 = ttk.Frame(notebook)
