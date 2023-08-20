@@ -1254,7 +1254,7 @@ frame_reporte = ttk.LabelFrame(frame, text="Reporte")
 frame_reporte.grid(row=2, column=0, columnspan=2, padx=(30, 0), pady=(5, 30), sticky="nw")
 
 frame_total = ttk.Frame(frame_reporte)
-frame_total.grid(row=0, column=0, padx=(25, 15), pady=(5, 15), sticky="nsew")
+frame_total.grid(row=0, column=0, padx=(20, 10), pady=(5, 10), sticky="nsew")
 
 # Notebook
 notebook = ttk.Notebook(frame_total)
@@ -1436,7 +1436,7 @@ separador.grid(row=0, column=1, padx=(15, 15), pady=(10, 15), sticky="nsew")
 
 # FRAME FACTURACIÓN #
 frame_facturacion = ttk.LabelFrame(frame_reporte, text="Periodo de Facturación")
-frame_facturacion.grid(row=0, column=2, padx=(15, 25), pady=(5, 15), sticky="nsew")
+frame_facturacion.grid(row=0, column=2, padx=(15, 20), pady=(5, 15), sticky="nsew")
 
 label_inicio = ttk.Label(frame_facturacion, text="Fecha Inicio:")
 label_inicio.grid(row=0, column=0, padx=(15, 0), pady=(5, 5), sticky="e")
