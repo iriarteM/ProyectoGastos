@@ -16,14 +16,13 @@ screen_height = user32.GetSystemMetrics(1)
 def center_window(window):
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
-    window.update_idletasks()  # Asegurarse de que la ventana tenga las dimensiones correctas
+    window.update_idletasks()
     window_width = window.winfo_reqwidth()
     window_height = window.winfo_reqheight()
     x = (screen_width - window_width) // 2
     y = (screen_height - window_height) // 2
     window.geometry(f"+{x}+{y}")
-
-
+    
 def actualizar():
     entry_fecha.delete(0, tk.END)
     selected_usuario.set("Seleccionar")
@@ -129,8 +128,7 @@ def actualizar():
             
         except Exception as ex:
             print("Error al ejecutar la consulta:", ex)
-
-
+            
 def switch_callback():
     global treeview
     if switch.instate(["selected"]):
@@ -148,7 +146,6 @@ def switch_callback():
         tree()
         actualizar()
         
-
 def obtener_fecha(event):
     fecha_seleccionada = entry_fecha.get_date()
     entry_fecha["state"] = "readonly"
@@ -163,7 +160,7 @@ def generar_id_gasto():
         return 1
     else:
         return result[0][0] + 1
-
+    
 def generar_id_usuario():
     consulta = """ SELECT MAX(USUARIO) FROM USUARIOS"""
     result = ejecutar_query(conectar_bd(), consulta)
@@ -171,7 +168,7 @@ def generar_id_usuario():
         return 1
     else:
         return result[0][0] + 1
-
+    
 def generar_id_banco():
     consulta = """ SELECT MAX(BANCO) FROM BANCOS"""
     result = ejecutar_query(conectar_bd(), consulta)
@@ -179,7 +176,7 @@ def generar_id_banco():
         return 1
     else:
         return result[0][0] + 1
-
+    
 def generar_id_establecimiento():
     consulta = """ SELECT MAX(ESTABLECIMIENTO) FROM ESTABLECIMIENTOS"""
     result = ejecutar_query(conectar_bd(), consulta)
@@ -187,8 +184,7 @@ def generar_id_establecimiento():
         return 1
     else:
         return result[0][0] + 1
-
-
+    
 def obtener_usuario_id():
     usuario = combobox_usuarios.get()
     consulta = """
@@ -209,8 +205,7 @@ def obtener_usuario_id():
 
         except Exception as ex:
             print("Error al ejecutar la consulta:", ex)
-
-
+            
 def obtener_establecimiento_id():
     establecimiento = combobox_establecimientos.get()
     consulta = """
@@ -231,8 +226,7 @@ def obtener_establecimiento_id():
 
         except Exception as ex:
             print("Error al ejecutar la consulta:", ex)
-
-
+            
 def registrar_gasto():
     usuario = combobox_usuarios.get()
     establecimiento = combobox_establecimientos.get()
@@ -292,8 +286,7 @@ def registrar_gasto():
             except Exception as ex:
                 cerrar_bd(conexion)
                 messagebox.showerror("Error", "Error al insertar datos: " + str(ex))
-
-
+                
 def seleccion(event):
     seleccion = treeview.selection()
     combobox_bancos["state"] = "disabled"
@@ -322,8 +315,7 @@ def seleccion(event):
         selected_nro_tarjeta.set(gasto[6])
         entry_monto.delete(0, tk.END)
         entry_monto.insert(0, gasto[9])
-
-
+        
 def editar_gasto():
     seleccion = treeview.selection()
     if len(seleccion) == 0:
@@ -332,8 +324,7 @@ def editar_gasto():
     respuesta = messagebox.askyesno("Confirmar Edición", "Vas a modificar un gasto. ¿Deseas continuar?")
     if respuesta:
         editar_gasto_seleccionado(seleccion)
-
-
+        
 def editar_gasto_seleccionado(seleccion):
     item_values = treeview.item(seleccion, "values")
     id = item_values[0]
@@ -388,8 +379,7 @@ def editar_gasto_seleccionado(seleccion):
         except Exception as ex:
             cerrar_bd(conexion)
             messagebox.showerror("Error", "Error al modificar gasto: " + str(ex))
-
-
+            
 def eliminar_gasto():
     seleccion = treeview.selection()
     if len(seleccion) == 0:
@@ -398,8 +388,7 @@ def eliminar_gasto():
     respuesta = messagebox.askyesno("Confirmar Eliminación", "Vas a eliminar un gasto. ¿Deseas continuar?")
     if respuesta:
         eliminar_gasto_seleccionado(seleccion)
-
-
+        
 def eliminar_gasto_seleccionado(seleccion):
     item_values = treeview.item(seleccion, "values")
     id = item_values[0]
@@ -420,8 +409,7 @@ def eliminar_gasto_seleccionado(seleccion):
         except Exception as ex:
             cerrar_bd(conexion)
             messagebox.showerror("Error", "Error al eliminar gasto: " + str(ex))
-
-
+            
 def filtrar_datos():
     selected_usuario_filtro = combobox_usuarios_filtro.get()
     selected_banco_filtro = combobox_bancos_filtro.get()
@@ -615,13 +603,12 @@ def filtrar_datos():
             entry_promedio.delete(0, "end")
             entry_promedio.insert(0, round(promedio, 2))
             entry_promedio["state"] = "readonly"
-    
-    
+          
+            
 root = tk.Tk()
 style = ttk.Style(root)
 root.title("GESTIÓN DE GASTOS")
 root.resizable(0, 0)
-
 
 # IMPORTAR TCL
 root.tk.call("source", "forest-dark.tcl")
@@ -651,7 +638,6 @@ entry_fecha["state"] = "readonly"
 entry_fecha.delete(0, "end")
 entry_fecha.bind("<<DateEntrySelected>>", obtener_fecha)
 
-
 label_usuario = ttk.Label(frames_datos, text="Usuario:")
 label_usuario.grid(row=0, column=1, padx=(15, 0), sticky="w")
 selected_usuario = tk.StringVar(frames_datos)
@@ -663,7 +649,6 @@ combobox_usuarios = ttk.Combobox(
     width=20,
 )
 combobox_usuarios.grid(row=1, column=1, padx=(15, 0), sticky="w")
-
 
 label_banco = ttk.Label(frames_datos, text="Banco:")
 label_banco.grid(row=0, column=2, padx=(15, 0), sticky="w")
@@ -677,7 +662,6 @@ combobox_bancos = ttk.Combobox(
 )
 combobox_bancos.grid(row=1, column=2, padx=(15, 0), sticky="w")
 
-
 label_nro_tarjeta = ttk.Label(frames_datos, text="Nro. Tarjeta:")
 label_nro_tarjeta.grid(row=0, column=3, padx=(15, 0), sticky="w")
 selected_nro_tarjeta = tk.StringVar(frames_datos)
@@ -689,7 +673,6 @@ combobox_nro_tarjeta = ttk.Combobox(
     width=8,
 )
 combobox_nro_tarjeta.grid(row=1, column=3, padx=(15, 0), sticky="w")
-
 
 def actualizar_usuarios():
     conexion = conectar_bd()
@@ -716,7 +699,6 @@ def actualizar_usuarios():
             cerrar_bd(conexion)
             messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
 actualizar_usuarios()
-
 
 def actualizar_bancos(event):
     selected_usuario = combobox_usuarios.get()
@@ -759,8 +741,7 @@ def actualizar_bancos(event):
         except Exception as ex:
             cerrar_bd(conexion)
             messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
-
-
+            
 def actualizar_nros_tarjeta(event):
     selected_usuario = combobox_usuarios.get()
     selected_banco = combobox_bancos.get()
@@ -802,12 +783,10 @@ def actualizar_nros_tarjeta(event):
         except Exception as ex:
             cerrar_bd(conexion)
             messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
-
-
+            
 # Asociar las funciones a los eventos de cambio en los combobox
 combobox_usuarios.bind("<<ComboboxSelected>>", actualizar_bancos)
 combobox_bancos.bind("<<ComboboxSelected>>", actualizar_nros_tarjeta)
-
 
 label_establecimiento = ttk.Label(frames_datos, text="Establecimiento:")
 label_establecimiento.grid(row=3, column=0, padx=(15, 0), sticky="w")
@@ -820,7 +799,6 @@ combobox_establecimientos = ttk.Combobox(
     width=20,
 )
 combobox_establecimientos.grid(row=4, column=0, padx=(15, 0), sticky="w")
-
 
 def actualizar_establecimientos():
     conexion = conectar_bd()
@@ -848,7 +826,6 @@ def actualizar_establecimientos():
             messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
 actualizar_establecimientos()
 
-
 label_detalle = ttk.Label(frames_datos, text="Detalle:")
 label_detalle.grid(row=3, column=1, columnspan=2, padx=(15, 0), sticky="w")
 entry_detalle = ttk.Entry(frames_datos, width=52)
@@ -870,7 +847,6 @@ boton_editar.grid(row=2, column=5, padx=(15, 15), pady=(15, 0), sticky="nw")
 
 boton_eliminar = ttk.Button(frames_datos, text="Eliminar Selección", width=20, command=eliminar_gasto)
 boton_eliminar.grid(row=4, column=5, padx=(15, 15), pady=(0, 0), sticky="nw")
-
 
 # FRAME TABLA #
 def tree():
@@ -918,10 +894,7 @@ def tree():
     treeview.configure()
     scroll_tabla.configure(command=treeview.yview)
     treeview.bind("<ButtonRelease-1>", seleccion)
-
-
 tree()
-
 
 # FRAME FILTROS #
 frame_filtros = ttk.LabelFrame(frame, text="Filtrar datos")
@@ -964,7 +937,6 @@ combobox_nro_tarjeta_filtro = ttk.Combobox(
 )
 combobox_nro_tarjeta_filtro.grid(row=5, column=0, columnspan=3, padx=(15, 15), pady=(0, 12), sticky="w")
 
-
 def actualizar_usuarios_filtro():
     conexion = conectar_bd()
     if conexion:
@@ -990,7 +962,6 @@ def actualizar_usuarios_filtro():
             cerrar_bd(conexion)
             messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
 actualizar_usuarios_filtro()
-
 
 def actualizar_bancos_filtro(event):
     selected_usuario_filtro = combobox_usuarios_filtro.get()
@@ -1048,8 +1019,7 @@ def actualizar_bancos_filtro(event):
         except Exception as ex:
             cerrar_bd(conexion)
             messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
-
-
+            
 def actualizar_nros_tarjeta_filtro(event):
     selected_usuario_filtro = combobox_usuarios_filtro.get()
     selected_banco_filtro = combobox_bancos_filtro.get()
@@ -1106,8 +1076,7 @@ def actualizar_nros_tarjeta_filtro(event):
         except Exception as ex:
             cerrar_bd(conexion)
             messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
-
-
+            
 def actualizar_dia_filtro(event):
     selected_usuario_filtro = combobox_usuarios_filtro.get()
     selected_banco_filtro = combobox_bancos_filtro.get()
@@ -1187,8 +1156,7 @@ def actualizar_dia_filtro(event):
         except Exception as ex:
             cerrar_bd(conexion)
             messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
-
-
+            
 # Asociar las funciones a los eventos de cambio en los combobox
 combobox_usuarios_filtro.bind("<<ComboboxSelected>>", actualizar_bancos_filtro)
 combobox_bancos_filtro.bind("<<ComboboxSelected>>", actualizar_nros_tarjeta_filtro)
@@ -1208,12 +1176,10 @@ entry_dia.grid(row=7, column=0, padx=(15, 0), pady=(5, 15), sticky="nsew")
 entry_dia.insert(0, "01")
 entry_dia["state"] = "disabled"
 
-
 def selected_mes(event):
     selected_value = combobox_mes.get().split("-")[0]
     combobox_mes.set(selected_value.zfill(2))
-
-
+    
 combobox_mes = ttk.Combobox(
     frame_filtros,
     values=[
@@ -1556,10 +1522,8 @@ entry_mas_gastos_pasado.grid(row=5, column=1, padx=(20, 15), pady=(0, 15), stick
 
 notebook.pack(expand=True, fill="both", padx=5, pady=5)
 
-
 separador = ttk.Separator(frame_reporte)
 separador.grid(row=0, column=1, padx=(15, 15), pady=(10, 15), sticky="nsew")
-
 
 
 # FRAME FACTURACIÓN #
@@ -1568,42 +1532,36 @@ frame_facturacion.grid(row=0, column=2, padx=(15, 20), pady=(5, 15), sticky="nse
 
 label_inicio = ttk.Label(frame_facturacion, text="Fecha Inicio:")
 label_inicio.grid(row=0, column=0, padx=(15, 0), pady=(5, 5), sticky="e")
-
 entry_inicio = ttk.Entry(frame_facturacion, state="disabled", width=10)
 entry_inicio.grid(row=0, column=1, padx=(0, 15), pady=(5, 5), sticky="w")
 
 
 label_cierre = ttk.Label(frame_facturacion, text="Fecha Fin:")
 label_cierre.grid(row=1, column=0, padx=(15, 0), pady=(5, 5), sticky="e")
-
 entry_cierre = ttk.Entry(frame_facturacion, state="disabled", width=10)
 entry_cierre.grid(row=1, column=1, padx=(0, 15), pady=(5, 5), sticky="w")
 
 
 label_pago = ttk.Label(frame_facturacion, text="Fecha Pago:")
 label_pago.grid(row=2, column=0, padx=(15, 0), pady=(5, 5), sticky="e")
-
 entry_pago = ttk.Entry(frame_facturacion, state="disabled", width=10)
 entry_pago.grid(row=2, column=1, padx=(0, 15), pady=(5, 5), sticky="w")
 
 
 label_total = ttk.Label(frame_facturacion, text="Pago Total del Mes:", font=("Arial", 10, "bold"))
 label_total.grid(row=3, column=0, padx=(15, 0), pady=(5, 5), sticky="e")
-
 entry_total = ttk.Entry(frame_facturacion, state="disabled", width=10)
 entry_total.grid(row=3, column=1, padx=(0, 15), pady=(5, 5), sticky="w")
 
 
 label_promedio = ttk.Label(frame_facturacion, text="Pago Promedio:")
 label_promedio.grid(row=4, column=0, padx=(15, 0), pady=(5, 5), sticky="e")
-
 entry_promedio = ttk.Entry(frame_facturacion, state="disabled", width=10)
 entry_promedio.grid(row=4, column=1, padx=(0, 15), pady=(5, 5), sticky="w")
 
 
 boton_generar_reporte = ttk.Button(frame_facturacion, text="Generar Reporte")
 boton_generar_reporte.grid(row=5, column=0, columnspan=2, padx=(15, 15), pady=(5, 12), sticky="nsew")
-
 
 
 # FRAME CONFIGURACIÓN #
@@ -1811,7 +1769,6 @@ def ventana_usuarios(parent_style):
     separador = ttk.Separator(frame)
     separador.grid(row=0, column=1, rowspan=10, padx=(5, 5), pady=(5, 5), sticky="nsew")
     
-    
     def tree_user():
         frame_tabla_usuarios = ttk.Frame(frame)
         frame_tabla_usuarios.grid(row=0, column=2, rowspan=10, padx=(5, 15), pady=(5, 5), sticky="nsew")
@@ -1838,8 +1795,7 @@ def ventana_usuarios(parent_style):
         treeview_usuarios.configure()
         scroll_tabla.configure(command=treeview_usuarios.yview)
         treeview_usuarios.bind("<ButtonRelease-1>", seleccion_usuarios)
-
-
+        
     def tabla_usuarios():
         treeview_usuarios.delete(*treeview_usuarios.get_children())
         conexion = conectar_bd()
@@ -1857,8 +1813,7 @@ def ventana_usuarios(parent_style):
             except Exception as ex:
                 cerrar_bd(conexion)
                 messagebox.showerror("Error", "Error al insertar datos: " + str(ex))
-
-
+                
     def cerrar_ventana_usuarios():
         ventana_usuarios.destroy()
         root.deiconify()
@@ -1866,7 +1821,7 @@ def ventana_usuarios(parent_style):
         actualizar_usuarios()
         actualizar_usuarios_filtro()
         actualizar()
-
+        
     ventana_usuarios.protocol("WM_DELETE_WINDOW", cerrar_ventana_usuarios)
     ventana_usuarios.grab_set()
     
@@ -1875,7 +1830,7 @@ def ventana_usuarios(parent_style):
     center_window(ventana_usuarios)
     
     ventana_usuarios.mainloop()
-
+    
 
 # VENTANA BANCOS #
 def ventana_bancos(parent_style):
@@ -1891,11 +1846,11 @@ def ventana_bancos(parent_style):
     
     def seleccion_bancos(event):
         seleccion = treeview_bancos.selection()
-
+        
         if seleccion:
             item = seleccion[0]
             banco = treeview_bancos.item(item, "values")
-
+            
             entry_bank.delete(0, tk.END)
             entry_bank.insert(0, banco[1])
     
@@ -1932,7 +1887,7 @@ def ventana_bancos(parent_style):
                 except Exception as ex:
                     cerrar_bd(conexion)
                     messagebox.showerror("Error", "Error al insertar datos: " + str(ex))
-    
+                    
     def editar_banco():
         seleccion = treeview_bancos.selection()
         if len(seleccion) == 0:
@@ -1980,11 +1935,11 @@ def ventana_bancos(parent_style):
         respuesta = messagebox.askyesno("Confirmar Eliminación", "ADVERTENCIA: Eliminar un banco afecta toda la información relacionada a este. ¿Deseas continuar?")
         if respuesta:
             eliminar_banco_seleccionado(seleccion)
-
+            
     def eliminar_banco_seleccionado(seleccion):
         item_values = treeview_bancos.item(seleccion, "values")
         id = item_values[0]
-
+        
         conexion = conectar_bd()
         if conexion:
             try:
@@ -2034,8 +1989,7 @@ def ventana_bancos(parent_style):
             except Exception as ex:
                 cerrar_bd(conexion)
                 messagebox.showerror("Error", "Error al eliminar banco: " + str(ex))
-    
-    
+                
     ventana_style = ttk.Style(ventana_bancos)
     ventana_style.theme_use(parent_style.theme_use())
     
@@ -2044,7 +1998,6 @@ def ventana_bancos(parent_style):
     
     label_bank = ttk.Label(frame, text="Nombre del banco:")
     label_bank.grid(row=0, column=0, padx=(15, 5), pady=(12, 5), sticky="nsew")
-
     entry_bank = ttk.Entry(frame, state="normal")
     entry_bank.grid(row=1, column=0, padx=(15, 5), pady=(0, 5), sticky="nsew")
     
@@ -2063,11 +2016,10 @@ def ventana_bancos(parent_style):
     separador = ttk.Separator(frame)
     separador.grid(row=0, column=1, rowspan=10, padx=(5, 5), pady=(5, 5), sticky="nsew")
     
-    
     def tree_bank():
         frame_tabla_bancos = ttk.Frame(frame)
         frame_tabla_bancos.grid(row=0, column=2, rowspan=10, padx=(5, 15), pady=(5, 5), sticky="nsew")
-
+        
         scroll_tabla = ttk.Scrollbar(frame_tabla_bancos)
         scroll_tabla.pack(side="right", fill="y")
         
@@ -2085,13 +2037,12 @@ def ventana_bancos(parent_style):
 
         for encabezado in encabezados:
             treeview_bancos.heading(encabezado, text=encabezado)
-
+            
         treeview_bancos.pack()
         treeview_bancos.configure()
         scroll_tabla.configure(command=treeview_bancos.yview)
         treeview_bancos.bind("<ButtonRelease-1>", seleccion_bancos)
-
-
+        
     def tabla_bancos():
         treeview_bancos.delete(*treeview_bancos.get_children())
         conexion = conectar_bd()
@@ -2109,14 +2060,13 @@ def ventana_bancos(parent_style):
             except Exception as ex:
                 cerrar_bd(conexion)
                 messagebox.showerror("Error", "Error al insertar datos: " + str(ex))
-
-
+                
     def cerrar_ventana_bancos():
         ventana_bancos.destroy()
         root.deiconify()
         root.grab_set()
         actualizar()
-
+        
     ventana_bancos.protocol("WM_DELETE_WINDOW", cerrar_ventana_bancos)
     ventana_bancos.grab_set()
     
@@ -2145,10 +2095,10 @@ def ventana_establecimientos(parent_style):
         if seleccion:
             item = seleccion[0]
             establecimiento = treeview_establecimientos.item(item, "values")
-
+            
             entry_estab.delete(0, tk.END)
             entry_estab.insert(0, establecimiento[1])
-    
+            
     def registrar_establecimiento():
         establecimiento = entry_estab.get()
         if establecimiento == "":
@@ -2178,11 +2128,11 @@ def ventana_establecimientos(parent_style):
                     entry_estab.delete(0, tk.END)
                     
                     messagebox.showinfo("establecimiento Registrado", "El establecimiento se registro correctamente.")
-
+                    
                 except Exception as ex:
                     cerrar_bd(conexion)
                     messagebox.showerror("Error", "Error al insertar datos: " + str(ex))
-    
+                    
     def editar_establecimiento():
         seleccion = treeview_establecimientos.selection()
         if len(seleccion) == 0:
@@ -2191,7 +2141,7 @@ def ventana_establecimientos(parent_style):
         respuesta = messagebox.askyesno("Confirmar Edición", "ADVERTENCIA: Modificar un establecimiento afecta toda la información relacionada a este. ¿Deseas continuar?")
         if respuesta:
             editar_establecimiento_seleccionado(seleccion)
-
+            
     def editar_establecimiento_seleccionado(seleccion):
         item_values = treeview_establecimientos.item(seleccion, "values")
         id = item_values[0]
@@ -2217,7 +2167,7 @@ def ventana_establecimientos(parent_style):
                 tabla_establecimientos()
                 
                 entry_estab.delete(0, tk.END)
-
+                
             except Exception as ex:
                 cerrar_bd(conexion)
                 messagebox.showerror("Error", "Error al modificar establecimiento: " + str(ex))
@@ -2230,11 +2180,11 @@ def ventana_establecimientos(parent_style):
         respuesta = messagebox.askyesno("Confirmar Eliminación", "ADVERTENCIA: Eliminar un establecimiento afecta toda la información relacionada a este. ¿Deseas continuar?")
         if respuesta:
             eliminar_establecimiento_seleccionado(seleccion)
-
+            
     def eliminar_establecimiento_seleccionado(seleccion):
         item_values = treeview_establecimientos.item(seleccion, "values")
         id = item_values[0]
-
+        
         conexion = conectar_bd()
         if conexion:
             try:
@@ -2267,8 +2217,7 @@ def ventana_establecimientos(parent_style):
             except Exception as ex:
                 cerrar_bd(conexion)
                 messagebox.showerror("Error", "Error al eliminar establecimiento: " + str(ex))
-    
-    
+                
     ventana_style = ttk.Style(ventana_establecimientos)
     ventana_style.theme_use(parent_style.theme_use())
     
@@ -2277,7 +2226,6 @@ def ventana_establecimientos(parent_style):
     
     label_estab = ttk.Label(frame, text="Nombre del establecimiento:")
     label_estab.grid(row=0, column=0, padx=(15, 5), pady=(12, 5), sticky="nsew")
-
     entry_estab = ttk.Entry(frame, state="normal")
     entry_estab.grid(row=1, column=0, padx=(15, 5), pady=(0, 5), sticky="nsew")
     
@@ -2295,7 +2243,6 @@ def ventana_establecimientos(parent_style):
     
     separador = ttk.Separator(frame)
     separador.grid(row=0, column=1, rowspan=10, padx=(5, 5), pady=(5, 5), sticky="nsew")
-    
     
     def tree_estab():
         frame_tabla_establecimientos = ttk.Frame(frame)
@@ -2318,13 +2265,12 @@ def ventana_establecimientos(parent_style):
 
         for encabezado in encabezados:
             treeview_establecimientos.heading(encabezado, text=encabezado)
-
+            
         treeview_establecimientos.pack()
         treeview_establecimientos.configure()
         scroll_tabla.configure(command=treeview_establecimientos.yview)
         treeview_establecimientos.bind("<ButtonRelease-1>", seleccion_establecimientos)
-
-
+        
     def tabla_establecimientos():
         treeview_establecimientos.delete(*treeview_establecimientos.get_children())
         conexion = conectar_bd()
@@ -2342,15 +2288,14 @@ def ventana_establecimientos(parent_style):
             except Exception as ex:
                 cerrar_bd(conexion)
                 messagebox.showerror("Error", "Error al insertar datos: " + str(ex))
-
-
+                
     def cerrar_ventana_establecimientos():
         ventana_establecimientos.destroy()
         root.deiconify()
         root.grab_set()
         actualizar_establecimientos()
         actualizar()
-
+        
     ventana_establecimientos.protocol("WM_DELETE_WINDOW", cerrar_ventana_establecimientos)
     ventana_establecimientos.grab_set()
     
@@ -2374,11 +2319,11 @@ def ventana_tarjetas(parent_style):
     
     def seleccion_tarjetas(event):
         seleccion = treeview_tarjetas.selection()
-
+        
         if seleccion:
             item = seleccion[0]
             tarjeta = treeview_tarjetas.item(item, "values")
-
+            
             entry_card.delete(0, tk.END)
             entry_card.insert(0, tarjeta[0])
             if tarjeta[1] == "Titular":
@@ -2438,7 +2383,7 @@ def ventana_tarjetas(parent_style):
                 result = cursor.fetchall()
                 cursor.close()
                 return result[0][0]
-
+            
             except Exception as ex:
                 print("Error al ejecutar la consulta:", ex)
     
@@ -2474,7 +2419,7 @@ def ventana_tarjetas(parent_style):
         else:
             usuarios_usuario = obtener_user_id()
             bancos_banco = obtener_banco_id()
-        
+            
             conexion = conectar_bd()
             if conexion:
                 try:
@@ -2500,11 +2445,11 @@ def ventana_tarjetas(parent_style):
                     entry_card.delete(0, tk.END)
                     
                     messagebox.showinfo("tarjeta Registrado", "La tarjeta se registro correctamente.")
-
+                    
                 except Exception as ex:
                     cerrar_bd(conexion)
                     messagebox.showerror("Error", "Error al insertar datos: " + str(ex))
-    
+                    
     def editar_tarjeta():
         seleccion = treeview_tarjetas.selection()
         if len(seleccion) == 0:
@@ -2513,7 +2458,7 @@ def ventana_tarjetas(parent_style):
         respuesta = messagebox.askyesno("Confirmar Edición", "ADVERTENCIA: Modificar una tarjeta afecta toda la información relacionada a esta. ¿Deseas continuar?")
         if respuesta:
             editar_tarjeta_seleccionado(seleccion)
-
+            
     def editar_tarjeta_seleccionado(seleccion):
         item_values = treeview_tarjetas.item(seleccion, "values")
         tarjeta = item_values[0]
@@ -2598,7 +2543,7 @@ def ventana_tarjetas(parent_style):
                 tabla_tarjetas()
                 
                 entry_card.delete(0, tk.END)
-
+                
             except Exception as ex:
                 cerrar_bd(conexion)
                 messagebox.showerror("Error", "Error al modificar tarjeta: " + str(ex))
@@ -2611,7 +2556,7 @@ def ventana_tarjetas(parent_style):
         respuesta = messagebox.askyesno("Confirmar Eliminación", "ADVERTENCIA: Eliminar una tarjeta afecta toda la información relacionada a esta. ¿Deseas continuar?")
         if respuesta:
             eliminar_tarjeta_seleccionado(seleccion)
-
+            
     def eliminar_tarjeta_seleccionado(seleccion):
         id = treeview_tarjetas.item(seleccion, "values")
         
@@ -2627,7 +2572,7 @@ def ventana_tarjetas(parent_style):
                 )
                 conexion.commit()
                 cursor.close()
-
+                
                 cursor = conexion.cursor()
                 cursor.execute(
                     """
@@ -2639,15 +2584,15 @@ def ventana_tarjetas(parent_style):
                 cursor.close()
                 
                 cerrar_bd(conexion)
-
+                
                 treeview_tarjetas.delete(seleccion)
                 messagebox.showinfo("Eliminación Confirmada", "La tarjeta se eliminó correctamente.")
                 tabla_tarjetas()
-
+                
             except Exception as ex:
                 cerrar_bd(conexion)
                 messagebox.showerror("Error", "Error al eliminar tarjeta: " + str(ex))
-    
+                
     ventana_style = ttk.Style(ventana_tarjetas)
     ventana_style.theme_use(parent_style.theme_use())
     
@@ -2656,7 +2601,6 @@ def ventana_tarjetas(parent_style):
     
     label_card = ttk.Label(frame, text="Nro tarjeta:")
     label_card.grid(row=0, column=0, padx=(15, 5), pady=(12, 5), sticky="w")
-
     entry_card = ttk.Entry(frame, state="normal", width=13)
     entry_card.grid(row=1, column=0, padx=(15, 5), pady=(0, 5), sticky="w")
     
@@ -2679,15 +2623,15 @@ def ventana_tarjetas(parent_style):
             nombres_usuarios = cursor.fetchall()
             cursor.close()
             cerrar_bd(conexion)
-
+            
             opciones_usuarios = [nombre[0] for nombre in nombres_usuarios]
             combobox_usuarios["values"] = opciones_usuarios
             combobox_usuarios.set("Seleccionar")
-
+            
         except Exception as ex:
             cerrar_bd(conexion)
             messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
-    
+            
     label_banco = ttk.Label(frame, text="Banco:")
     label_banco.grid(row=0, column=2, columnspan=2, padx=(15, 0), pady=(12, 5), sticky="w")
     selected_banco = tk.StringVar(frame)
@@ -2707,24 +2651,22 @@ def ventana_tarjetas(parent_style):
             nombres_bancos = cursor.fetchall()
             cursor.close()
             cerrar_bd(conexion)
-
+            
             opciones_bancos = [nombre[0] for nombre in nombres_bancos]
             combobox_bancos["values"] = opciones_bancos
             combobox_bancos.set("Seleccionar")
-
+            
         except Exception as ex:
             cerrar_bd(conexion)
             messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
-    
+            
     label_cierre = ttk.Label(frame, text="Día de cierre:")
     label_cierre.grid(row=2, column=0, padx=(15, 5), pady=(12, 5), sticky="nsew")
-
     entry_cierre = ttk.Entry(frame, state="normal", width=13)
     entry_cierre.grid(row=3, column=0, padx=(15, 5), pady=(0, 5), sticky="w")
     
     label_venci = ttk.Label(frame, text="Día vencimiento:")
     label_venci.grid(row=2, column=1, padx=(15, 5), pady=(12, 5), sticky="nsew")
-
     entry_venci = ttk.Entry(frame, state="normal", width=13)
     entry_venci.grid(row=3, column=1, padx=(15, 5), pady=(0, 5), sticky="w")
     
@@ -2732,7 +2674,6 @@ def ventana_tarjetas(parent_style):
     label_tipo.grid(row=2, column=2, rowspan=2, padx=(15, 0), pady=(12, 5), sticky="nsew")
     
     a = tk.IntVar(value=1)
-    
     check_titular = ttk.Radiobutton(frame, text="Titular", variable=a, value=1)
     check_titular.grid(row=2, column=3, padx=(0, 0), pady=(0, 0), sticky="w")
     check_adicional = ttk.Radiobutton(frame, text="Adicional", variable=a, value=2)
@@ -2753,11 +2694,10 @@ def ventana_tarjetas(parent_style):
     separador = ttk.Separator(frame)
     separador.grid(row=0, column=4, rowspan=10, padx=(5, 5), pady=(5, 5), sticky="nsew")
     
-    
     def tree_card():
         frame_tabla_tarjetas = ttk.Frame(frame)
         frame_tabla_tarjetas.grid(row=0, column=5, rowspan=10, padx=(5, 15), pady=(5, 10), sticky="nsew")
-
+        
         scroll_tabla = ttk.Scrollbar(frame_tabla_tarjetas)
         scroll_tabla.pack(side="right", fill="y")
         
@@ -2776,16 +2716,15 @@ def ventana_tarjetas(parent_style):
         treeview_tarjetas.column("VENCIMIENTO", width=100)
         treeview_tarjetas.column("USUARIO", width=70)
         treeview_tarjetas.column("BANCO", width=110)
-
+        
         for encabezado in encabezados:
             treeview_tarjetas.heading(encabezado, text=encabezado)
-
+            
         treeview_tarjetas.pack()
         treeview_tarjetas.configure()
         scroll_tabla.configure(command=treeview_tarjetas.yview)
         treeview_tarjetas.bind("<ButtonRelease-1>", seleccion_tarjetas)
-
-
+        
     def tabla_tarjetas():
         treeview_tarjetas.delete(*treeview_tarjetas.get_children())
         conexion = conectar_bd()
@@ -2816,14 +2755,13 @@ def ventana_tarjetas(parent_style):
             except Exception as ex:
                 cerrar_bd(conexion)
                 messagebox.showerror("Error", "Error al insertar datos: " + str(ex))
-
-
+                
     def cerrar_ventana_tarjetas():
         ventana_tarjetas.destroy()
         root.deiconify()
         root.grab_set()
         actualizar()
-
+        
     ventana_tarjetas.protocol("WM_DELETE_WINDOW", cerrar_ventana_tarjetas)
     ventana_tarjetas.grab_set()
     
@@ -2833,7 +2771,6 @@ def ventana_tarjetas(parent_style):
     
     ventana_tarjetas.mainloop()
     
-
 actualizar()
 
 center_window(root)
