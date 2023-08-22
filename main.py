@@ -1378,13 +1378,6 @@ def reporte_gastos():
             cursor.close()
             cerrar_bd(conexion2)
             
-            mes_alto = datos[0][1]
-            mes_bajo = datos[-1][1]
-            formato_mes_alto = meses.get(mes_alto, "")
-            mes_alto = f"{formato_mes_alto}"
-            formato_mes_bajo = meses.get(mes_bajo, "")
-            mes_bajo = f"{formato_mes_bajo}"
-            
             if len(datos) == 0:
                 entry_gasto_alto["state"] = "normal"
                 entry_gasto_alto.delete(0, "end")
@@ -1396,6 +1389,13 @@ def reporte_gastos():
                 entry_gasto_bajo.insert(0, 0.0)
                 entry_gasto_bajo["state"] = "readonly"
             else:
+                mes_alto = datos[0][1]
+                mes_bajo = datos[-1][1]
+                formato_mes_alto = meses.get(mes_alto, "")
+                mes_alto = f"{formato_mes_alto}"
+                formato_mes_bajo = meses.get(mes_bajo, "")
+                mes_bajo = f"{formato_mes_bajo}"
+                
                 entry_gasto_alto["state"] = "normal"
                 entry_gasto_alto.delete(0, "end")
                 entry_gasto_alto.insert(0, f"{mes_alto}   |   S/. " + str(round(datos[0][0],2)))
