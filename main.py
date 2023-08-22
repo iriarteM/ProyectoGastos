@@ -596,12 +596,12 @@ def filtrar_datos():
             
             entry_total["state"] = "normal"
             entry_total.delete(0, "end")
-            entry_total.insert(0, round(total, 2))
+            entry_total.insert(0, "S/. " + str(round(total, 2)))
             entry_total["state"] = "readonly"
             
             entry_promedio["state"] = "normal"
             entry_promedio.delete(0, "end")
-            entry_promedio.insert(0, round(promedio, 2))
+            entry_promedio.insert(0, "S/. " + str(round(promedio, 2)))
             entry_promedio["state"] = "readonly"
           
             
@@ -1227,6 +1227,21 @@ frame_total.grid(row=0, column=0, padx=(20, 10), pady=(5, 10), sticky="nsew")
 # Notebook
 notebook = ttk.Notebook(frame_total)
 
+meses = {
+    1: "ENERO",
+    2: "FEBRERO",
+    3: "MARZO",
+    4: "ABRIL",
+    5: "MAYO",
+    6: "JUNIO",
+    7: "JULIO",
+    8: "AGOSTO",
+    9: "SEPTIEMBRE",
+    10: "OCTUBRE",
+    11: "NOVIEMBRE",
+    12: "DICIEMBRE"
+}
+
 # Tab #1
 tab_1 = ttk.Frame(notebook)
 notebook.add(tab_1, text="Gastos")
@@ -1257,6 +1272,11 @@ def reporte_gastos():
             cursor.close()
             cerrar_bd(conexion)
             
+            formato_mes = meses.get(mes, "")
+            mes_actual = f"{formato_mes}"
+            formato_mes_pasado = meses.get(mes-1, "")
+            mes_pasado = f"{formato_mes_pasado}"
+
             if len(gasto_mes) == 0:
                 entry_gasto_mes["state"] = "normal"
                 entry_gasto_mes.delete(0, "end")
@@ -1270,7 +1290,7 @@ def reporte_gastos():
             elif len(gasto_mes) == 1:
                 entry_gasto_mes["state"] = "normal"
                 entry_gasto_mes.delete(0, "end")
-                entry_gasto_mes.insert(0, gasto_mes[0][0])
+                entry_gasto_mes.insert(0, f"{mes_actual}   |   S/. " + str(round(gasto_mes[0][0],2)))
                 entry_gasto_mes["state"] = "readonly"
                 
                 entry_gasto_mes_pasado["state"] = "normal"
@@ -1280,12 +1300,12 @@ def reporte_gastos():
             else:
                 entry_gasto_mes["state"] = "normal"
                 entry_gasto_mes.delete(0, "end")
-                entry_gasto_mes.insert(0, gasto_mes[0][0])
+                entry_gasto_mes.insert(0, f"{mes_actual}   |   S/. " + str(round(gasto_mes[0][0],2)))
                 entry_gasto_mes["state"] = "readonly"
                 
                 entry_gasto_mes_pasado["state"] = "normal"
                 entry_gasto_mes_pasado.delete(0, "end")
-                entry_gasto_mes_pasado.insert(0, gasto_mes[1][0])
+                entry_gasto_mes_pasado.insert(0, f"{mes_pasado}   |   S/. " + str(round(gasto_mes[1][0],2)))
                 entry_gasto_mes_pasado["state"] = "readonly"
             
         except Exception as ex:
@@ -1325,12 +1345,12 @@ def reporte_gastos():
                 promedio = datos[0][0]/mes
                 entry_gasto_mes_promedio["state"] = "normal"
                 entry_gasto_mes_promedio.delete(0, "end")
-                entry_gasto_mes_promedio.insert(0, round(promedio,2))
+                entry_gasto_mes_promedio.insert(0, "S/. " + str(round(promedio,2)))
                 entry_gasto_mes_promedio["state"] = "readonly"
                 
                 entry_gasto_año["state"] = "normal"
                 entry_gasto_año.delete(0, "end")
-                entry_gasto_año.insert(0, datos[0][0])
+                entry_gasto_año.insert(0, f"{año}   |   S/. " + str(round(datos[0][0],2)))
                 entry_gasto_año["state"] = "readonly"
             
         except Exception as ex:
@@ -1358,8 +1378,12 @@ def reporte_gastos():
             cursor.close()
             cerrar_bd(conexion2)
             
-            print(len(datos))
-            print(datos)
+            mes_alto = datos[0][1]
+            mes_bajo = datos[-1][1]
+            formato_mes_alto = meses.get(mes_alto, "")
+            mes_alto = f"{formato_mes_alto}"
+            formato_mes_bajo = meses.get(mes_bajo, "")
+            mes_bajo = f"{formato_mes_bajo}"
             
             if len(datos) == 0:
                 entry_gasto_alto["state"] = "normal"
@@ -1374,12 +1398,12 @@ def reporte_gastos():
             else:
                 entry_gasto_alto["state"] = "normal"
                 entry_gasto_alto.delete(0, "end")
-                entry_gasto_alto.insert(0, datos[0][0])
+                entry_gasto_alto.insert(0, f"{mes_alto}   |   S/. " + str(round(datos[0][0],2)))
                 entry_gasto_alto["state"] = "readonly"
                 
                 entry_gasto_bajo["state"] = "normal"
                 entry_gasto_bajo.delete(0, "end")
-                entry_gasto_bajo.insert(0, datos[-1][0])
+                entry_gasto_bajo.insert(0, f"{mes_bajo}   |   S/. " + str(round(datos[-1][0],2)))
                 entry_gasto_bajo["state"] = "readonly"
                 
         except Exception as ex:
