@@ -41,7 +41,9 @@ def actualizar():
     entry_monto.delete(0, tk.END)
     
     treeview.delete(*treeview.get_children())
-
+    
+    reporte_gastos()
+    
     consulta = """
         SELECT
             G.ID "ID",
@@ -1263,6 +1265,114 @@ notebook = ttk.Notebook(frame_total)
 tab_1 = ttk.Frame(notebook)
 notebook.add(tab_1, text="Gastos")
 
+def reporte_gastos():
+    fecha_actual = datetime.now().date()
+    mes = fecha_actual.month
+    año = fecha_actual.year
+
+    conexion = conectar_bd()
+    if conexion:
+        try:
+            cursor = conexion.cursor()
+            cursor.execute(
+                """
+                SELECT
+                    SUM(G.MONTO) "GASTO TOTAL",
+                    CAST(strftime('%m', G.FECHA) AS INTEGER) "MES"
+                FROM GASTOS G
+                JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
+                WHERE CAST(strftime('%Y', G.FECHA) AS INTEGER) = :año
+                GROUP BY "MES"
+                ORDER BY "MES" DESC
+                """,
+                (año,),
+            )
+            gasto_mes = cursor.fetchall()
+            cursor.close()
+            cerrar_bd(conexion)
+
+            entry_gasto_mes["state"] = "normal"
+            entry_gasto_mes.delete(0, "end")
+            entry_gasto_mes.insert(0, gasto_mes[0][0])
+            entry_gasto_mes["state"] = "readonly"
+            
+            entry_gasto_mes_pasado["state"] = "normal"
+            entry_gasto_mes_pasado.delete(0, "end")
+            entry_gasto_mes_pasado.insert(0, gasto_mes[1][0])
+            entry_gasto_mes_pasado["state"] = "readonly"
+            
+        except Exception as ex:
+            cerrar_bd(conexion)
+            messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+    
+    conexion1 = conectar_bd()
+    if conexion1:
+        try:
+            cursor = conexion1.cursor()
+            cursor.execute(
+                """
+                SELECT
+                    SUM(G.MONTO) "GASTO TOTAL"
+                FROM GASTOS G
+                JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
+                WHERE CAST(strftime('%Y', G.fecha) AS INTEGER) = :año
+                """,
+                (año,),
+            )
+            datos = cursor.fetchall()
+            cursor.close()
+            cerrar_bd(conexion1)
+            
+            promedio = datos[0][0]/mes
+            entry_gasto_mes_promedio["state"] = "normal"
+            entry_gasto_mes_promedio.delete(0, "end")
+            entry_gasto_mes_promedio.insert(0, round(promedio,2))
+            entry_gasto_mes_promedio["state"] = "readonly"
+            
+            entry_gasto_año["state"] = "normal"
+            entry_gasto_año.delete(0, "end")
+            entry_gasto_año.insert(0, datos[0][0])
+            entry_gasto_año["state"] = "readonly"
+            
+        except Exception as ex:
+            cerrar_bd(conexion1)
+            messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+    
+    conexion2 = conectar_bd()
+    if conexion2:
+        try:
+            cursor = conexion2.cursor()
+            cursor.execute(
+                """
+                SELECT
+                    SUM(G.MONTO) "GASTO TOTAL",
+                    CAST(strftime('%m', G.fecha) AS INTEGER) "MES"
+                FROM GASTOS G
+                JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
+                WHERE CAST(strftime('%Y', G.fecha) AS INTEGER) = :año
+                GROUP BY "MES"
+                ORDER BY "GASTO TOTAL" DESC
+                """,
+                (año,),
+            )
+            datos = cursor.fetchall()
+            cursor.close()
+            cerrar_bd(conexion2)
+            
+            entry_gasto_alto["state"] = "normal"
+            entry_gasto_alto.delete(0, "end")
+            entry_gasto_alto.insert(0, datos[0][0])
+            entry_gasto_alto["state"] = "readonly"
+            
+            entry_gasto_bajo["state"] = "normal"
+            entry_gasto_bajo.delete(0, "end")
+            entry_gasto_bajo.insert(0, datos[-1][0])
+            entry_gasto_bajo["state"] = "readonly"
+            
+        except Exception as ex:
+            cerrar_bd(conexion2)
+            messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+
 label_gasto_mes = ttk.Label(tab_1, text="Gasto Mes Actual:")
 label_gasto_mes.grid(row=0, column=0, padx=(15, 0), pady=(10, 0), sticky="nsew")
 entry_gasto_mes = ttk.Entry(tab_1, state="disabled", width=20)
@@ -1292,7 +1402,6 @@ label_gasto_bajo = ttk.Label(tab_1, text="Gasto Más Bajo (Mes):")
 label_gasto_bajo.grid(row=4, column=1, padx=(20, 15), pady=(10, 0), sticky="nsew")
 entry_gasto_bajo = ttk.Entry(tab_1, state="disabled", width=20)
 entry_gasto_bajo.grid(row=5, column=1, padx=(20, 15), pady=(0, 15), sticky="nsew")
-
 
 # Tab #2
 tab_2 = ttk.Frame(notebook)
