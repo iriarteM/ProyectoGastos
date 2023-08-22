@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from tkcalendar import DateEntry
-from datetime import datetime, timedelta
+from datetime import datetime
 import ctypes
 
 user32 = ctypes.windll.user32
@@ -1290,16 +1290,37 @@ def reporte_gastos():
             gasto_mes = cursor.fetchall()
             cursor.close()
             cerrar_bd(conexion)
-
-            entry_gasto_mes["state"] = "normal"
-            entry_gasto_mes.delete(0, "end")
-            entry_gasto_mes.insert(0, gasto_mes[0][0])
-            entry_gasto_mes["state"] = "readonly"
             
-            entry_gasto_mes_pasado["state"] = "normal"
-            entry_gasto_mes_pasado.delete(0, "end")
-            entry_gasto_mes_pasado.insert(0, gasto_mes[1][0])
-            entry_gasto_mes_pasado["state"] = "readonly"
+            if len(gasto_mes) == 0:
+                entry_gasto_mes["state"] = "normal"
+                entry_gasto_mes.delete(0, "end")
+                entry_gasto_mes.insert(0, 0.0)
+                entry_gasto_mes["state"] = "readonly"
+                
+                entry_gasto_mes_pasado["state"] = "normal"
+                entry_gasto_mes_pasado.delete(0, "end")
+                entry_gasto_mes_pasado.insert(0, 0.0)
+                entry_gasto_mes_pasado["state"] = "readonly"
+            elif len(gasto_mes) == 1:
+                entry_gasto_mes["state"] = "normal"
+                entry_gasto_mes.delete(0, "end")
+                entry_gasto_mes.insert(0, gasto_mes[0][0])
+                entry_gasto_mes["state"] = "readonly"
+                
+                entry_gasto_mes_pasado["state"] = "normal"
+                entry_gasto_mes_pasado.delete(0, "end")
+                entry_gasto_mes_pasado.insert(0, 0.0)
+                entry_gasto_mes_pasado["state"] = "readonly"
+            else:
+                entry_gasto_mes["state"] = "normal"
+                entry_gasto_mes.delete(0, "end")
+                entry_gasto_mes.insert(0, gasto_mes[0][0])
+                entry_gasto_mes["state"] = "readonly"
+                
+                entry_gasto_mes_pasado["state"] = "normal"
+                entry_gasto_mes_pasado.delete(0, "end")
+                entry_gasto_mes_pasado.insert(0, gasto_mes[1][0])
+                entry_gasto_mes_pasado["state"] = "readonly"
             
         except Exception as ex:
             cerrar_bd(conexion)
@@ -1321,18 +1342,30 @@ def reporte_gastos():
             )
             datos = cursor.fetchall()
             cursor.close()
+            
             cerrar_bd(conexion1)
             
-            promedio = datos[0][0]/mes
-            entry_gasto_mes_promedio["state"] = "normal"
-            entry_gasto_mes_promedio.delete(0, "end")
-            entry_gasto_mes_promedio.insert(0, round(promedio,2))
-            entry_gasto_mes_promedio["state"] = "readonly"
-            
-            entry_gasto_año["state"] = "normal"
-            entry_gasto_año.delete(0, "end")
-            entry_gasto_año.insert(0, datos[0][0])
-            entry_gasto_año["state"] = "readonly"
+            if datos[0][0] is None:
+                entry_gasto_mes_promedio["state"] = "normal"
+                entry_gasto_mes_promedio.delete(0, "end")
+                entry_gasto_mes_promedio.insert(0, 0.0)
+                entry_gasto_mes_promedio["state"] = "readonly"
+                
+                entry_gasto_año["state"] = "normal"
+                entry_gasto_año.delete(0, "end")
+                entry_gasto_año.insert(0, 0.0)
+                entry_gasto_año["state"] = "readonly"
+            else:
+                promedio = datos[0][0]/mes
+                entry_gasto_mes_promedio["state"] = "normal"
+                entry_gasto_mes_promedio.delete(0, "end")
+                entry_gasto_mes_promedio.insert(0, round(promedio,2))
+                entry_gasto_mes_promedio["state"] = "readonly"
+                
+                entry_gasto_año["state"] = "normal"
+                entry_gasto_año.delete(0, "end")
+                entry_gasto_año.insert(0, datos[0][0])
+                entry_gasto_año["state"] = "readonly"
             
         except Exception as ex:
             cerrar_bd(conexion1)
@@ -1359,16 +1392,30 @@ def reporte_gastos():
             cursor.close()
             cerrar_bd(conexion2)
             
-            entry_gasto_alto["state"] = "normal"
-            entry_gasto_alto.delete(0, "end")
-            entry_gasto_alto.insert(0, datos[0][0])
-            entry_gasto_alto["state"] = "readonly"
+            print(len(datos))
+            print(datos)
             
-            entry_gasto_bajo["state"] = "normal"
-            entry_gasto_bajo.delete(0, "end")
-            entry_gasto_bajo.insert(0, datos[-1][0])
-            entry_gasto_bajo["state"] = "readonly"
-            
+            if len(datos) == 0:
+                entry_gasto_alto["state"] = "normal"
+                entry_gasto_alto.delete(0, "end")
+                entry_gasto_alto.insert(0, 0.0)
+                entry_gasto_alto["state"] = "readonly"
+                
+                entry_gasto_bajo["state"] = "normal"
+                entry_gasto_bajo.delete(0, "end")
+                entry_gasto_bajo.insert(0, 0.0)
+                entry_gasto_bajo["state"] = "readonly"
+            else:
+                entry_gasto_alto["state"] = "normal"
+                entry_gasto_alto.delete(0, "end")
+                entry_gasto_alto.insert(0, datos[0][0])
+                entry_gasto_alto["state"] = "readonly"
+                
+                entry_gasto_bajo["state"] = "normal"
+                entry_gasto_bajo.delete(0, "end")
+                entry_gasto_bajo.insert(0, datos[-1][0])
+                entry_gasto_bajo["state"] = "readonly"
+                
         except Exception as ex:
             cerrar_bd(conexion2)
             messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
