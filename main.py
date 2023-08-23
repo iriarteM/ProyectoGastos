@@ -1,16 +1,9 @@
-from conexion import conectar_bd
-from conexion import ejecutar_query
-from conexion import cerrar_bd
 import tkinter as tk
+from conexion import *
 from tkinter import ttk
 from tkinter import messagebox
 from tkcalendar import DateEntry
 from datetime import datetime
-import ctypes
-
-user32 = ctypes.windll.user32
-screen_width = user32.GetSystemMetrics(0)
-screen_height = user32.GetSystemMetrics(1)
 
 # FUNCIONES #
 def center_window(window):
@@ -133,14 +126,14 @@ def switch_callback():
     global treeview
     if switch.instate(["selected"]):
         style.theme_use("forest-dark")
-        # root.configure(bg = "#313131")
+        root.configure(bg = "#313131")
         if treeview:
             treeview.destroy()
         tree()
         actualizar()
     else:
         style.theme_use("forest-light")
-        # root.configure(bg = "#ffffff")
+        root.configure(bg = "#ffffff")
         if treeview:
             treeview.destroy()
         tree()
