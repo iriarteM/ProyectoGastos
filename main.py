@@ -35,6 +35,9 @@ def actualizar():
     treeview.delete(*treeview.get_children())
     
     reporte_gastos()
+    reporte_usuarios()
+    #reporte_bancos()
+    #reporte_establecimientos()
     
     consulta = """
         SELECT
@@ -47,21 +50,21 @@ def actualizar():
             T.NRO_TARJETA "NRO TARJETA",
             T.TIPO "TIPO",
             CASE 
-                WHEN CAST(strftime('%d', G.fecha) AS INTEGER) <= T.cierre THEN
+                WHEN CAST(strftime('%d', "FECHA") AS INTEGER) <= T.CIERRE THEN
                     CASE 
-                        WHEN CAST(strftime('%m', G.fecha) AS INTEGER) = 12 THEN
-                            date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER)+1, CAST(strftime('%m', G.fecha) AS INTEGER)-11, T.vencimiento))
+                        WHEN CAST(strftime('%m', "FECHA") AS INTEGER) = 12 THEN
+                            date(printf('%04d-%02d-%02d', CAST(strftime('%Y', "FECHA") AS INTEGER)+1, CAST(strftime('%m', "FECHA") AS INTEGER)-11, T.VENCIMIENTO))
                     ELSE
-                        date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER), CAST(strftime('%m', G.fecha) AS INTEGER)+1, T.vencimiento))
+                        date(printf('%04d-%02d-%02d', CAST(strftime('%Y', "FECHA") AS INTEGER), CAST(strftime('%m', "FECHA") AS INTEGER)+1, T.VENCIMIENTO))
                     END
             ELSE
                 CASE 
-                    WHEN CAST(strftime('%d', G.fecha) AS INTEGER) >= T.cierre+1 THEN
+                    WHEN CAST(strftime('%d', "FECHA") AS INTEGER) >= T.CIERRE+1 THEN
                         CASE 
-                            WHEN CAST(strftime('%m', G.fecha) AS INTEGER) = 12 THEN
-                                date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER)+1, CAST(strftime('%m', G.fecha) AS INTEGER)-10, T.vencimiento))
+                            WHEN CAST(strftime('%m', "FECHA") AS INTEGER) = 12 THEN
+                                date(printf('%04d-%02d-%02d', CAST(strftime('%Y', "FECHA") AS INTEGER)+1, CAST(strftime('%m', "FECHA") AS INTEGER)-10, T.VENCIMIENTO))
                         ELSE
-                            date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER), CAST(strftime('%m', G.fecha) AS INTEGER)+2, T.vencimiento))
+                            date(printf('%04d-%02d-%02d', CAST(strftime('%Y', "FECHA") AS INTEGER), CAST(strftime('%m', "FECHA") AS INTEGER)+2, T.VENCIMIENTO))
                         END
                 END
             END "FECHA PAGO",
@@ -71,7 +74,7 @@ def actualizar():
         JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
         JOIN TARJETAS T ON T.NRO_TARJETA = G.TARJETAS_NRO_TARJETA
         JOIN BANCOS B ON B.BANCO = T.BANCOS_BANCO
-        ORDER BY G.FECHA DESC
+        ORDER BY "FECHA" DESC
         """
     conexion = conectar_bd()
     if conexion:
@@ -447,21 +450,21 @@ def filtrar_datos():
                         T.NRO_TARJETA "NRO TARJETA",
                         T.TIPO "TIPO",
                         CASE 
-                            WHEN CAST(strftime('%d', G.fecha) AS INTEGER) <= T.cierre THEN
+                            WHEN CAST(strftime('%d', "FECHA") AS INTEGER) <= T.CIERRE THEN
                                 CASE 
-                                    WHEN CAST(strftime('%m', G.fecha) AS INTEGER) = 12 THEN
-                                        date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER)+1, CAST(strftime('%m', G.fecha) AS INTEGER)-11, T.vencimiento))
+                                    WHEN CAST(strftime('%m', "FECHA") AS INTEGER) = 12 THEN
+                                        date(printf('%04d-%02d-%02d', CAST(strftime('%Y', "FECHA") AS INTEGER)+1, CAST(strftime('%m', "FECHA") AS INTEGER)-11, T.VENCIMIENTO))
                                 ELSE
-                                    date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER), CAST(strftime('%m', G.fecha) AS INTEGER)+1, T.vencimiento))
+                                    date(printf('%04d-%02d-%02d', CAST(strftime('%Y', "FECHA") AS INTEGER), CAST(strftime('%m', "FECHA") AS INTEGER)+1, T.VENCIMIENTO))
                                 END
                         ELSE
                             CASE 
-                                WHEN CAST(strftime('%d', G.fecha) AS INTEGER) >= T.cierre+1 THEN
+                                WHEN CAST(strftime('%d', "FECHA") AS INTEGER) >= T.CIERRE+1 THEN
                                     CASE 
-                                        WHEN CAST(strftime('%m', G.fecha) AS INTEGER) = 12 THEN
-                                            date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER)+1, CAST(strftime('%m', G.fecha) AS INTEGER)-10, T.vencimiento))
+                                        WHEN CAST(strftime('%m', "FECHA") AS INTEGER) = 12 THEN
+                                            date(printf('%04d-%02d-%02d', CAST(strftime('%Y', "FECHA") AS INTEGER)+1, CAST(strftime('%m', "FECHA") AS INTEGER)-10, T.VENCIMIENTO))
                                     ELSE
-                                        date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER), CAST(strftime('%m', G.fecha) AS INTEGER)+2, T.vencimiento))
+                                        date(printf('%04d-%02d-%02d', CAST(strftime('%Y', "FECHA") AS INTEGER), CAST(strftime('%m', "FECHA") AS INTEGER)+2, T.VENCIMIENTO))
                                     END
                             END
                         END "FECHA PAGO",
@@ -471,8 +474,8 @@ def filtrar_datos():
                     JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
                     JOIN TARJETAS T ON T.NRO_TARJETA = G.TARJETAS_NRO_TARJETA
                     JOIN BANCOS B ON B.BANCO = T.BANCOS_BANCO
-                    WHERE U.NOMBRE_USUARIO = :selected_usuario_filtro AND B.NOMBRE_BANCO = :selected_banco_filtro AND T.NRO_TARJETA = :selected_nro_tarjeta_filtro AND G.FECHA >= date(printf('%04d-%02d-%02d', :año_inicio, :mes_inicio, T.cierre+1)) AND G.FECHA <= date(printf('%04d-%02d-%02d', :año_cierre, :mes_cierre, T.cierre))
-                    ORDER BY G.FECHA DESC
+                    WHERE U.NOMBRE_USUARIO = :selected_usuario_filtro AND B.NOMBRE_BANCO = :selected_banco_filtro AND T.NRO_TARJETA = :selected_nro_tarjeta_filtro AND "FECHA" >= date(printf('%04d-%02d-%02d', :año_inicio, :mes_inicio, T.CIERRE+1)) AND "FECHA" <= date(printf('%04d-%02d-%02d', :año_cierre, :mes_cierre, T.CIERRE))
+                    ORDER BY "FECHA" DESC
                     """,
                     (
                         selected_usuario_filtro,
@@ -517,21 +520,21 @@ def filtrar_datos():
                     SELECT
                         T.CIERRE,
                         CASE 
-                            WHEN CAST(strftime('%d', G.fecha) AS INTEGER) <= T.cierre THEN
+                            WHEN CAST(strftime('%d', G.fecha) AS INTEGER) <= T.CIERRE THEN
                                 CASE 
                                     WHEN CAST(strftime('%m', G.fecha) AS INTEGER) = 12 THEN
-                                        date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER)+1, CAST(strftime('%m', G.fecha) AS INTEGER)-11, T.vencimiento))
+                                        date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER)+1, CAST(strftime('%m', G.fecha) AS INTEGER)-11, T.VENCIMIENTO))
                                 ELSE
-                                    date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER), CAST(strftime('%m', G.fecha) AS INTEGER)+1, T.vencimiento))
+                                    date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER), CAST(strftime('%m', G.fecha) AS INTEGER)+1, T.VENCIMIENTO))
                                 END
                         ELSE
                             CASE 
-                                WHEN CAST(strftime('%d', G.fecha) AS INTEGER) >= T.cierre+1 THEN
+                                WHEN CAST(strftime('%d', G.fecha) AS INTEGER) >= T.CIERRE+1 THEN
                                     CASE 
                                         WHEN CAST(strftime('%m', G.fecha) AS INTEGER) = 12 THEN
-                                            date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER)+1, CAST(strftime('%m', G.fecha) AS INTEGER)-10, T.vencimiento))
+                                            date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER)+1, CAST(strftime('%m', G.fecha) AS INTEGER)-10, T.VENCIMIENTO))
                                     ELSE
-                                        date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER), CAST(strftime('%m', G.fecha) AS INTEGER)+2, T.vencimiento))
+                                        date(printf('%04d-%02d-%02d', CAST(strftime('%Y', G.fecha) AS INTEGER), CAST(strftime('%m', G.fecha) AS INTEGER)+2, T.VENCIMIENTO))
                                     END
                             END
                         END "FECHA PAGO",
@@ -1221,29 +1224,33 @@ frame_total.grid(row=0, column=0, padx=(20, 10), pady=(5, 10), sticky="nsew")
 notebook = ttk.Notebook(frame_total)
 
 meses = {
-    1: "ENERO",
-    2: "FEBRERO",
-    3: "MARZO",
-    4: "ABRIL",
-    5: "MAYO",
-    6: "JUNIO",
-    7: "JULIO",
-    8: "AGOSTO",
-    9: "SEPTIEMBRE",
-    10: "OCTUBRE",
-    11: "NOVIEMBRE",
-    12: "DICIEMBRE"
+    1: "ENE",
+    2: "FEB",
+    3: "MAR",
+    4: "ABR",
+    5: "MAY",
+    6: "JUN",
+    7: "JUL",
+    8: "AGO",
+    9: "SEP",
+    10: "OCT",
+    11: "NOV",
+    12: "DIC"
 }
+fecha_actual = datetime.now().date()
+mes = fecha_actual.month
+año = fecha_actual.year
+
+formato_mes = meses.get(mes, "")
+mes_actual = f"{formato_mes}"
+formato_mes_pasado = meses.get(mes-1, "")
+mes_pasado = f"{formato_mes_pasado}"
 
 # Tab #1
 tab_1 = ttk.Frame(notebook)
 notebook.add(tab_1, text="Gastos")
 
 def reporte_gastos():
-    fecha_actual = datetime.now().date()
-    mes = fecha_actual.month
-    año = fecha_actual.year
-
     conexion = conectar_bd()
     if conexion:
         try:
@@ -1264,11 +1271,6 @@ def reporte_gastos():
             gasto_mes = cursor.fetchall()
             cursor.close()
             cerrar_bd(conexion)
-            
-            formato_mes = meses.get(mes, "")
-            mes_actual = f"{formato_mes}"
-            formato_mes_pasado = meses.get(mes-1, "")
-            mes_pasado = f"{formato_mes_pasado}"
 
             if len(gasto_mes) == 0:
                 entry_gasto_mes["state"] = "normal"
@@ -1338,12 +1340,12 @@ def reporte_gastos():
                 promedio = datos[0][0]/mes
                 entry_gasto_mes_promedio["state"] = "normal"
                 entry_gasto_mes_promedio.delete(0, "end")
-                entry_gasto_mes_promedio.insert(0, "S/. " + str(round(promedio,2)))
+                entry_gasto_mes_promedio.insert(0, f"{año}   |   S/. " + str(round(promedio,2)) + "/mes")
                 entry_gasto_mes_promedio["state"] = "readonly"
                 
                 entry_gasto_año["state"] = "normal"
                 entry_gasto_año.delete(0, "end")
-                entry_gasto_año.insert(0, f"{año}   |   S/. " + str(round(datos[0][0],2)))
+                entry_gasto_año.insert(0, f"{año}   |   S/. " + str(round(datos[0][0],2)) + "/año")
                 entry_gasto_año["state"] = "readonly"
             
         except Exception as ex:
@@ -1436,6 +1438,221 @@ entry_gasto_bajo.grid(row=5, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew"
 # Tab #2
 tab_2 = ttk.Frame(notebook)
 notebook.add(tab_2, text="Usuarios")
+
+
+def reporte_usuarios():
+    conexion = conectar_bd()
+    if conexion:
+        try:
+            cursor = conexion.cursor()
+            cursor.execute(
+                """
+                SELECT
+                    U.NOMBRE_USUARIO "USUARIO",
+                    COUNT(*) "FRECUENCIA",
+                    SUM(G.MONTO) "GASTO TOTAL",
+                    CAST(strftime('%m', G.fecha) AS INTEGER) "MES",
+                    CAST(strftime('%Y', G.fecha) AS INTEGER) "AÑO"
+                FROM GASTOS G
+                JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
+                WHERE "MES" = :mes AND "AÑO" = :año
+                GROUP BY "USUARIO"
+                ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
+                """,
+                (mes, año,),
+            )
+            datos = cursor.fetchall()
+            cursor.close()
+            cerrar_bd(conexion)
+
+            if len(datos) == 0:
+                entry_frecuencia["state"] = "normal"
+                entry_frecuencia.delete(0, "end")
+                entry_frecuencia.insert(0, "—")
+                entry_frecuencia["state"] = "readonly"
+                
+                entry_frecuencia_mes_pasado["state"] = "normal"
+                entry_frecuencia_mes_pasado.delete(0, "end")
+                entry_frecuencia_mes_pasado.insert(0, "—")
+                entry_frecuencia_mes_pasado["state"] = "readonly"
+            elif len(datos) == 1:
+                entry_frecuencia["state"] = "normal"
+                entry_frecuencia.delete(0, "end")
+                entry_frecuencia.insert(0, f"{mes_actual} | " + str(datos[0][0]) + " | fi: " + str(datos[0][1]))
+                entry_frecuencia["state"] = "readonly"
+                
+                entry_frecuencia_mes_pasado["state"] = "normal"
+                entry_frecuencia_mes_pasado.delete(0, "end")
+                entry_frecuencia_mes_pasado.insert(0, "—")
+                entry_frecuencia_mes_pasado["state"] = "readonly"
+            else:
+                entry_frecuencia["state"] = "normal"
+                entry_frecuencia.delete(0, "end")
+                entry_frecuencia.insert(0, f"{mes_actual} | " + str(datos[0][0]) + " | fi: " + str(datos[0][1]))
+                entry_frecuencia["state"] = "readonly"
+                
+                conexion = conectar_bd()
+                if conexion:
+                    mes_p = mes-1
+                    try:
+                        cursor = conexion.cursor()
+                        cursor.execute(
+                            """
+                            SELECT
+                                U.NOMBRE_USUARIO "USUARIO",
+                                COUNT(*) "FRECUENCIA",
+                                SUM(G.MONTO) "GASTO TOTAL",
+                                CAST(strftime('%m', G.fecha) AS INTEGER) "MES",
+                                CAST(strftime('%Y', G.fecha) AS INTEGER) "AÑO"
+                            FROM GASTOS G
+                            JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
+                            WHERE "MES" = :mes_p AND "AÑO" = :año
+                            GROUP BY "USUARIO"
+                            ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
+                            """,
+                            (mes_p, año,),
+                        )
+                        datos = cursor.fetchall()
+                        cursor.close()
+                        cerrar_bd(conexion)
+                        
+                        entry_frecuencia_mes_pasado["state"] = "normal"
+                        entry_frecuencia_mes_pasado.delete(0, "end")
+                        entry_frecuencia_mes_pasado.insert(0, f"{mes_pasado} | " + str(datos[0][0]) + " | fi: " + str(datos[0][1]))
+                        entry_frecuencia_mes_pasado["state"] = "readonly"
+                        
+                    except Exception as ex:
+                        cerrar_bd(conexion)
+                        messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                    
+        except Exception as ex:
+            cerrar_bd(conexion)
+            messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+    
+    conexion1 = conectar_bd()
+    if conexion1:
+        try:
+            cursor = conexion1.cursor()
+            cursor.execute(
+                """
+                SELECT
+                    U.NOMBRE_USUARIO "USUARIO",
+                    COUNT(*) "FRECUENCIA",
+                    SUM(G.MONTO) "GASTO TOTAL",
+                    CAST(strftime('%Y', G.fecha) AS INTEGER) "AÑO"
+                FROM GASTOS G
+                JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
+                WHERE "AÑO" = :año
+                GROUP BY "USUARIO"
+                ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
+                """,
+                (año,),
+            )
+            datos = cursor.fetchall()
+            cursor.close()
+            
+            cerrar_bd(conexion1)
+            
+            if datos[0][0] is None:
+                entry_frecuencia_promedio["state"] = "normal"
+                entry_frecuencia_promedio.delete(0, "end")
+                entry_frecuencia_promedio.insert(0, "—")
+                entry_frecuencia_promedio["state"] = "readonly"
+                
+                entry_frecuencia_año["state"] = "normal"
+                entry_frecuencia_año.delete(0, "end")
+                entry_frecuencia_año.insert(0, "—")
+                entry_frecuencia_año["state"] = "readonly"
+            else:
+                promedio = datos[0][1]/mes
+                entry_frecuencia_promedio["state"] = "normal"
+                entry_frecuencia_promedio.delete(0, "end")
+                entry_frecuencia_promedio.insert(0, f"{año} | " + str(datos[0][0]) + " | fi: " + str(int(promedio)) + "/mes")
+                entry_frecuencia_promedio["state"] = "readonly"
+                
+                entry_frecuencia_año["state"] = "normal"
+                entry_frecuencia_año.delete(0, "end")
+                entry_frecuencia_año.insert(0, f"{año} | " + str(datos[0][0]) + " |  fi: " + str(datos[0][1]) + "/año")
+                entry_frecuencia_año["state"] = "readonly"
+            
+        except Exception as ex:
+            cerrar_bd(conexion1)
+            messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+    
+    conexion2 = conectar_bd()
+    if conexion2:
+        try:
+            cursor = conexion2.cursor()
+            cursor.execute(
+                """
+                SELECT
+                    U.NOMBRE_USUARIO "USUARIO",
+                    SUM(G.MONTO) "GASTO TOTAL",
+                    CAST(strftime('%m', G.fecha) AS INTEGER) "MES",
+                    CAST(strftime('%Y', G.fecha) AS INTEGER) "AÑO"
+                FROM GASTOS G
+                JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
+                WHERE "MES" = :mes AND "AÑO" = :año
+                GROUP BY "USUARIO"
+                ORDER BY "GASTO TOTAL" DESC
+                """,
+                (mes, año,),
+            )
+            datos = cursor.fetchall()
+            cursor.close()
+            cerrar_bd(conexion2)
+            
+            if len(datos) == 0:
+                entry_mas_gastos["state"] = "normal"
+                entry_mas_gastos.delete(0, "end")
+                entry_mas_gastos.insert(0, "—")
+                entry_mas_gastos["state"] = "readonly"
+                
+                entry_mas_gastos_pasado["state"] = "normal"
+                entry_mas_gastos_pasado.delete(0, "end")
+                entry_mas_gastos_pasado.insert(0, "—")
+                entry_mas_gastos_pasado["state"] = "readonly"
+            else:
+                entry_mas_gastos["state"] = "normal"
+                entry_mas_gastos.delete(0, "end")
+                entry_mas_gastos.insert(0, f"{mes_actual} | " + str(datos[0][0]) + " | S/. " + str(datos[0][1]))
+                entry_mas_gastos["state"] = "readonly"
+                
+                conexion = conectar_bd()
+                if conexion:
+                    mes_p = mes-1
+                    try:
+                        cursor = conexion.cursor()
+                        cursor.execute(
+                            """
+                            SELECT
+                                U.NOMBRE_USUARIO "USUARIO",
+                                SUM(G.MONTO) "GASTO TOTAL",
+                                CAST(strftime('%m', G.fecha) AS INTEGER) "MES",
+                                CAST(strftime('%Y', G.fecha) AS INTEGER) "AÑO"
+                            FROM GASTOS G
+                            JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
+                            WHERE "MES" = :mes_p AND "AÑO" = :año
+                            GROUP BY "USUARIO"
+                            ORDER BY "GASTO TOTAL" DESC
+                            """,
+                            (mes_p, año,),
+                        )
+                        datos = cursor.fetchall()
+                        cursor.close()
+                        cerrar_bd(conexion)
+                        
+                        entry_mas_gastos_pasado["state"] = "normal"
+                        entry_mas_gastos_pasado.delete(0, "end")
+                        entry_mas_gastos_pasado.insert(0, f"{mes_pasado} | " + str(datos[0][0]) + " | S/. " + str(datos[0][1]))
+                        entry_mas_gastos_pasado["state"] = "readonly"
+                    except Exception as ex:
+                        cerrar_bd(conexion)
+                        messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                        
+        except Exception as ex:
+            cerrar_bd(conexion2)
+            messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
 
 label_frecuencia = ttk.Label(tab_2, text="Frecuencia Mes Actual:")
 label_frecuencia.grid(row=0, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
