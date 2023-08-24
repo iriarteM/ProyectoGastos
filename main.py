@@ -1238,14 +1238,12 @@ meses = {
     12: "DIC"
 }
 fecha_actual = datetime.now().date()
-mes = fecha_actual.month
-año = fecha_actual.year
-
-formato_mes = meses.get(mes, "")
-mes_actual = f"{formato_mes}"
-formato_mes_pasado = meses.get(mes-1, "")
-mes_pasado = f"{formato_mes_pasado}"
-
+#mes = fecha_actual.month
+#año = fecha_actual.year
+mes = 1
+año = 2023
+mes_actual = meses[mes]
+    
 # Tab #1
 tab_1 = ttk.Frame(notebook)
 notebook.add(tab_1, text="Gastos")
@@ -1271,140 +1269,327 @@ def reporte_gastos():
             gasto_mes = cursor.fetchall()
             cursor.close()
             cerrar_bd(conexion)
-
-            if len(gasto_mes) == 0:
-                entry_gasto_mes["state"] = "normal"
-                entry_gasto_mes.delete(0, "end")
-                entry_gasto_mes.insert(0, 0.0)
-                entry_gasto_mes["state"] = "readonly"
-                
-                entry_gasto_mes_pasado["state"] = "normal"
-                entry_gasto_mes_pasado.delete(0, "end")
-                entry_gasto_mes_pasado.insert(0, 0.0)
-                entry_gasto_mes_pasado["state"] = "readonly"
-            elif len(gasto_mes) == 1:
-                entry_gasto_mes["state"] = "normal"
-                entry_gasto_mes.delete(0, "end")
-                entry_gasto_mes.insert(0, f"{mes_actual}   |   S/. " + str(round(gasto_mes[0][0],2)))
-                entry_gasto_mes["state"] = "readonly"
-                
-                entry_gasto_mes_pasado["state"] = "normal"
-                entry_gasto_mes_pasado.delete(0, "end")
-                entry_gasto_mes_pasado.insert(0, 0.0)
-                entry_gasto_mes_pasado["state"] = "readonly"
-            else:
-                entry_gasto_mes["state"] = "normal"
-                entry_gasto_mes.delete(0, "end")
-                entry_gasto_mes.insert(0, f"{mes_actual}   |   S/. " + str(round(gasto_mes[0][0],2)))
-                entry_gasto_mes["state"] = "readonly"
-                
-                entry_gasto_mes_pasado["state"] = "normal"
-                entry_gasto_mes_pasado.delete(0, "end")
-                entry_gasto_mes_pasado.insert(0, f"{mes_pasado}   |   S/. " + str(round(gasto_mes[1][0],2)))
-                entry_gasto_mes_pasado["state"] = "readonly"
             
         except Exception as ex:
             cerrar_bd(conexion)
             messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
     
-    conexion1 = conectar_bd()
-    if conexion1:
-        try:
-            cursor = conexion1.cursor()
-            cursor.execute(
-                """
-                SELECT
-                    SUM(G.MONTO) "GASTO TOTAL"
-                FROM GASTOS G
-                JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
-                WHERE CAST(strftime('%Y', G.fecha) AS INTEGER) = :año
-                """,
-                (año,),
-            )
-            datos = cursor.fetchall()
-            cursor.close()
-            
-            cerrar_bd(conexion1)
-            
-            if datos[0][0] is None:
-                entry_gasto_mes_promedio["state"] = "normal"
-                entry_gasto_mes_promedio.delete(0, "end")
-                entry_gasto_mes_promedio.insert(0, 0.0)
-                entry_gasto_mes_promedio["state"] = "readonly"
-                
-                entry_gasto_año["state"] = "normal"
-                entry_gasto_año.delete(0, "end")
-                entry_gasto_año.insert(0, 0.0)
-                entry_gasto_año["state"] = "readonly"
-            else:
-                promedio = datos[0][0]/mes
-                entry_gasto_mes_promedio["state"] = "normal"
-                entry_gasto_mes_promedio.delete(0, "end")
-                entry_gasto_mes_promedio.insert(0, f"{año}   |   S/. " + str(round(promedio,2)) + "/mes")
-                entry_gasto_mes_promedio["state"] = "readonly"
-                
-                entry_gasto_año["state"] = "normal"
-                entry_gasto_año.delete(0, "end")
-                entry_gasto_año.insert(0, f"{año}   |   S/. " + str(round(datos[0][0],2)) + "/año")
-                entry_gasto_año["state"] = "readonly"
-            
-        except Exception as ex:
-            cerrar_bd(conexion1)
-            messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
-    
-    conexion2 = conectar_bd()
-    if conexion2:
-        try:
-            cursor = conexion2.cursor()
-            cursor.execute(
-                """
-                SELECT
-                    SUM(G.MONTO) "GASTO TOTAL",
-                    CAST(strftime('%m', G.fecha) AS INTEGER) "MES"
-                FROM GASTOS G
-                JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
-                WHERE CAST(strftime('%Y', G.fecha) AS INTEGER) = :año
-                GROUP BY "MES"
-                ORDER BY "GASTO TOTAL" DESC
-                """,
-                (año,),
-            )
-            datos = cursor.fetchall()
-            cursor.close()
-            cerrar_bd(conexion2)
-            
-            if len(datos) == 0:
-                entry_gasto_alto["state"] = "normal"
-                entry_gasto_alto.delete(0, "end")
-                entry_gasto_alto.insert(0, 0.0)
-                entry_gasto_alto["state"] = "readonly"
-                
-                entry_gasto_bajo["state"] = "normal"
-                entry_gasto_bajo.delete(0, "end")
-                entry_gasto_bajo.insert(0, 0.0)
-                entry_gasto_bajo["state"] = "readonly"
-            else:
-                mes_alto = datos[0][1]
-                mes_bajo = datos[-1][1]
-                formato_mes_alto = meses.get(mes_alto, "")
-                mes_alto = f"{formato_mes_alto}"
-                formato_mes_bajo = meses.get(mes_bajo, "")
-                mes_bajo = f"{formato_mes_bajo}"
-                
-                entry_gasto_alto["state"] = "normal"
-                entry_gasto_alto.delete(0, "end")
-                entry_gasto_alto.insert(0, f"{mes_alto}   |   S/. " + str(round(datos[0][0],2)))
-                entry_gasto_alto["state"] = "readonly"
-                
-                entry_gasto_bajo["state"] = "normal"
-                entry_gasto_bajo.delete(0, "end")
-                entry_gasto_bajo.insert(0, f"{mes_bajo}   |   S/. " + str(round(datos[-1][0],2)))
-                entry_gasto_bajo["state"] = "readonly"
-                
-        except Exception as ex:
-            cerrar_bd(conexion2)
-            messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+    if mes == 1:
+        mes_pasado = meses[12]
+        año_pasado = año-1
+        
+        conexion = conectar_bd()
+        if conexion:
+            try:
+                cursor = conexion.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.FECHA) AS INTEGER) "MES"
+                    FROM GASTOS G
+                    JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
+                    WHERE CAST(strftime('%Y', G.FECHA) AS INTEGER) = :año_pasado
+                    GROUP BY "MES"
+                    ORDER BY "MES" DESC
+                    """,
+                    (año_pasado,),
+                )
+                gasto_pasado = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion)
 
+                if len(gasto_mes) == 0 and len(gasto_pasado) == 0:
+                    entry_gasto_mes["state"] = "normal"
+                    entry_gasto_mes.delete(0, "end")
+                    entry_gasto_mes.insert(0, 0.0)
+                    entry_gasto_mes["state"] = "readonly"
+                    
+                    entry_gasto_mes_pasado["state"] = "normal"
+                    entry_gasto_mes_pasado.delete(0, "end")
+                    entry_gasto_mes_pasado.insert(0, 0.0)
+                    entry_gasto_mes_pasado["state"] = "readonly"
+                    
+                elif len(gasto_mes) == 1 and len(gasto_pasado) == 0:
+                    entry_gasto_mes["state"] = "normal"
+                    entry_gasto_mes.delete(0, "end")
+                    entry_gasto_mes.insert(0, f"{mes_actual}   |   S/. " + str(round(gasto_mes[0][0],2)))
+                    entry_gasto_mes["state"] = "readonly"
+                    
+                    entry_gasto_mes_pasado["state"] = "normal"
+                    entry_gasto_mes_pasado.delete(0, "end")
+                    entry_gasto_mes_pasado.insert(0, 0.0)
+                    entry_gasto_mes_pasado["state"] = "readonly"
+                    
+                elif len(gasto_mes) == 0 and len(gasto_pasado) == 1:
+                    entry_gasto_mes["state"] = "normal"
+                    entry_gasto_mes.delete(0, "end")
+                    entry_gasto_mes.insert(0, 0.0)
+                    entry_gasto_mes["state"] = "readonly"
+                    
+                    entry_gasto_mes_pasado["state"] = "normal"
+                    entry_gasto_mes_pasado.delete(0, "end")
+                    entry_gasto_mes_pasado.insert(0, f"{mes_pasado}   |   S/. " + str(round(gasto_pasado[0][0],2)))
+                    entry_gasto_mes_pasado["state"] = "readonly"
+                    
+                elif len(gasto_mes) >= 1 and len(gasto_pasado) >= 1:
+                    entry_gasto_mes["state"] = "normal"
+                    entry_gasto_mes.delete(0, "end")
+                    entry_gasto_mes.insert(0, f"{mes_actual}   |   S/. " + str(round(gasto_mes[0][0],2)))
+                    entry_gasto_mes["state"] = "readonly"
+                    
+                    entry_gasto_mes_pasado["state"] = "normal"
+                    entry_gasto_mes_pasado.delete(0, "end")
+                    entry_gasto_mes_pasado.insert(0, f"{mes_pasado}   |   S/. " + str(round(gasto_pasado[0][0],2)))
+                    entry_gasto_mes_pasado["state"] = "readonly"
+                    
+            except Exception as ex:
+                cerrar_bd(conexion)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                
+        conexion1 = conectar_bd()
+        if conexion1:
+            try:
+                cursor = conexion1.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        SUM(G.MONTO) "GASTO TOTAL"
+                    FROM GASTOS G
+                    JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
+                    WHERE CAST(strftime('%Y', G.fecha) AS INTEGER) = :año
+                    """,
+                    (año,),
+                )
+                datos = cursor.fetchall()
+                cursor.close()
+                
+                cerrar_bd(conexion1)
+                
+                if datos[0][0] is None:
+                    entry_gasto_mes_promedio["state"] = "normal"
+                    entry_gasto_mes_promedio.delete(0, "end")
+                    entry_gasto_mes_promedio.insert(0, 0.0)
+                    entry_gasto_mes_promedio["state"] = "readonly"
+                    
+                    entry_gasto_año["state"] = "normal"
+                    entry_gasto_año.delete(0, "end")
+                    entry_gasto_año.insert(0, 0.0)
+                    entry_gasto_año["state"] = "readonly"
+                else:
+                    promedio = datos[0][0]/mes
+                    entry_gasto_mes_promedio["state"] = "normal"
+                    entry_gasto_mes_promedio.delete(0, "end")
+                    entry_gasto_mes_promedio.insert(0, f"{año}   |   S/. " + str(round(promedio,2)) + "/mes")
+                    entry_gasto_mes_promedio["state"] = "readonly"
+                    
+                    entry_gasto_año["state"] = "normal"
+                    entry_gasto_año.delete(0, "end")
+                    entry_gasto_año.insert(0, f"{año}   |   S/. " + str(round(datos[0][0],2)) + "/año")
+                    entry_gasto_año["state"] = "readonly"
+                
+            except Exception as ex:
+                cerrar_bd(conexion1)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+        
+        conexion2 = conectar_bd()
+        if conexion2:
+            try:
+                cursor = conexion2.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.fecha) AS INTEGER) "MES"
+                    FROM GASTOS G
+                    JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
+                    WHERE CAST(strftime('%Y', G.fecha) AS INTEGER) = :año
+                    GROUP BY "MES"
+                    ORDER BY "GASTO TOTAL" DESC
+                    """,
+                    (año,),
+                )
+                datos = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion2)
+                
+                if len(datos) == 0:
+                    entry_gasto_alto["state"] = "normal"
+                    entry_gasto_alto.delete(0, "end")
+                    entry_gasto_alto.insert(0, 0.0)
+                    entry_gasto_alto["state"] = "readonly"
+                    
+                    entry_gasto_bajo["state"] = "normal"
+                    entry_gasto_bajo.delete(0, "end")
+                    entry_gasto_bajo.insert(0, 0.0)
+                    entry_gasto_bajo["state"] = "readonly"
+                else:
+                    mes_alto = datos[0][1]
+                    mes_bajo = datos[-1][1]
+                    formato_mes_alto = meses.get(mes_alto, "")
+                    mes_alto = f"{formato_mes_alto}"
+                    formato_mes_bajo = meses.get(mes_bajo, "")
+                    mes_bajo = f"{formato_mes_bajo}"
+                    
+                    entry_gasto_alto["state"] = "normal"
+                    entry_gasto_alto.delete(0, "end")
+                    entry_gasto_alto.insert(0, f"{mes_alto}   |   S/. " + str(round(datos[0][0],2)))
+                    entry_gasto_alto["state"] = "readonly"
+                    
+                    entry_gasto_bajo["state"] = "normal"
+                    entry_gasto_bajo.delete(0, "end")
+                    entry_gasto_bajo.insert(0, f"{mes_bajo}   |   S/. " + str(round(datos[-1][0],2)))
+                    entry_gasto_bajo["state"] = "readonly"
+                    
+            except Exception as ex:
+                cerrar_bd(conexion2)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                
+    else:
+        mes_pasado = meses[mes-1]
+
+        if len(gasto_mes) == 0:
+            entry_gasto_mes["state"] = "normal"
+            entry_gasto_mes.delete(0, "end")
+            entry_gasto_mes.insert(0, 0.0)
+            entry_gasto_mes["state"] = "readonly"
+            
+            entry_gasto_mes_pasado["state"] = "normal"
+            entry_gasto_mes_pasado.delete(0, "end")
+            entry_gasto_mes_pasado.insert(0, 0.0)
+            entry_gasto_mes_pasado["state"] = "readonly"
+            
+        elif len(gasto_mes) == 1:
+            entry_gasto_mes["state"] = "normal"
+            entry_gasto_mes.delete(0, "end")
+            entry_gasto_mes.insert(0, f"{mes_actual}   |   S/. " + str(round(gasto_mes[0][0],2)))
+            entry_gasto_mes["state"] = "readonly"
+            
+            entry_gasto_mes_pasado["state"] = "normal"
+            entry_gasto_mes_pasado.delete(0, "end")
+            entry_gasto_mes_pasado.insert(0, 0.0)
+            entry_gasto_mes_pasado["state"] = "readonly"
+            
+        elif len(gasto_mes) > 1 and gasto_mes[1][1] != mes-1:
+            entry_gasto_mes["state"] = "normal"
+            entry_gasto_mes.delete(0, "end")
+            entry_gasto_mes.insert(0, f"{mes_actual}   |   S/. " + str(round(gasto_mes[0][0],2)))
+            entry_gasto_mes["state"] = "readonly"
+            
+            entry_gasto_mes_pasado["state"] = "normal"
+            entry_gasto_mes_pasado.delete(0, "end")
+            entry_gasto_mes_pasado.insert(0, 0.0)
+            entry_gasto_mes_pasado["state"] = "readonly"
+            
+        else:
+            entry_gasto_mes["state"] = "normal"
+            entry_gasto_mes.delete(0, "end")
+            entry_gasto_mes.insert(0, f"{mes_actual}   |   S/. " + str(round(gasto_mes[0][0],2)))
+            entry_gasto_mes["state"] = "readonly"
+            
+            entry_gasto_mes_pasado["state"] = "normal"
+            entry_gasto_mes_pasado.delete(0, "end")
+            entry_gasto_mes_pasado.insert(0, f"{mes_pasado}   |   S/. " + str(round(gasto_mes[1][0],2)))
+            entry_gasto_mes_pasado["state"] = "readonly"
+                            
+        conexion1 = conectar_bd()
+        if conexion1:
+            try:
+                cursor = conexion1.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        SUM(G.MONTO) "GASTO TOTAL"
+                    FROM GASTOS G
+                    JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
+                    WHERE CAST(strftime('%Y', G.fecha) AS INTEGER) = :año
+                    """,
+                    (año,),
+                )
+                datos = cursor.fetchall()
+                cursor.close()
+                
+                cerrar_bd(conexion1)
+                
+                if datos[0][0] is None:
+                    entry_gasto_mes_promedio["state"] = "normal"
+                    entry_gasto_mes_promedio.delete(0, "end")
+                    entry_gasto_mes_promedio.insert(0, 0.0)
+                    entry_gasto_mes_promedio["state"] = "readonly"
+                    
+                    entry_gasto_año["state"] = "normal"
+                    entry_gasto_año.delete(0, "end")
+                    entry_gasto_año.insert(0, 0.0)
+                    entry_gasto_año["state"] = "readonly"
+                else:
+                    promedio = datos[0][0]/mes
+                    entry_gasto_mes_promedio["state"] = "normal"
+                    entry_gasto_mes_promedio.delete(0, "end")
+                    entry_gasto_mes_promedio.insert(0, f"{año}   |   S/. " + str(round(promedio,2)) + "/mes")
+                    entry_gasto_mes_promedio["state"] = "readonly"
+                    
+                    entry_gasto_año["state"] = "normal"
+                    entry_gasto_año.delete(0, "end")
+                    entry_gasto_año.insert(0, f"{año}   |   S/. " + str(round(datos[0][0],2)) + "/año")
+                    entry_gasto_año["state"] = "readonly"
+                
+            except Exception as ex:
+                cerrar_bd(conexion1)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+        
+        conexion2 = conectar_bd()
+        if conexion2:
+            try:
+                cursor = conexion2.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.fecha) AS INTEGER) "MES"
+                    FROM GASTOS G
+                    JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
+                    WHERE CAST(strftime('%Y', G.fecha) AS INTEGER) = :año
+                    GROUP BY "MES"
+                    ORDER BY "GASTO TOTAL" DESC
+                    """,
+                    (año,),
+                )
+                datos = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion2)
+                
+                if len(datos) == 0:
+                    entry_gasto_alto["state"] = "normal"
+                    entry_gasto_alto.delete(0, "end")
+                    entry_gasto_alto.insert(0, 0.0)
+                    entry_gasto_alto["state"] = "readonly"
+                    
+                    entry_gasto_bajo["state"] = "normal"
+                    entry_gasto_bajo.delete(0, "end")
+                    entry_gasto_bajo.insert(0, 0.0)
+                    entry_gasto_bajo["state"] = "readonly"
+                else:
+                    mes_alto = datos[0][1]
+                    mes_bajo = datos[-1][1]
+                    formato_mes_alto = meses.get(mes_alto, "")
+                    mes_alto = f"{formato_mes_alto}"
+                    formato_mes_bajo = meses.get(mes_bajo, "")
+                    mes_bajo = f"{formato_mes_bajo}"
+                    
+                    entry_gasto_alto["state"] = "normal"
+                    entry_gasto_alto.delete(0, "end")
+                    entry_gasto_alto.insert(0, f"{mes_alto}   |   S/. " + str(round(datos[0][0],2)))
+                    entry_gasto_alto["state"] = "readonly"
+                    
+                    entry_gasto_bajo["state"] = "normal"
+                    entry_gasto_bajo.delete(0, "end")
+                    entry_gasto_bajo.insert(0, f"{mes_bajo}   |   S/. " + str(round(datos[-1][0],2)))
+                    entry_gasto_bajo["state"] = "readonly"
+                    
+            except Exception as ex:
+                cerrar_bd(conexion2)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                
 label_gasto_mes = ttk.Label(tab_1, text="Gasto Mes Actual:")
 label_gasto_mes.grid(row=0, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
 entry_gasto_mes = ttk.Entry(tab_1, state="disabled", width=20)
@@ -1441,218 +1626,7 @@ notebook.add(tab_2, text="Usuarios")
 
 
 def reporte_usuarios():
-    conexion = conectar_bd()
-    if conexion:
-        try:
-            cursor = conexion.cursor()
-            cursor.execute(
-                """
-                SELECT
-                    U.NOMBRE_USUARIO "USUARIO",
-                    COUNT(*) "FRECUENCIA",
-                    SUM(G.MONTO) "GASTO TOTAL",
-                    CAST(strftime('%m', G.fecha) AS INTEGER) "MES",
-                    CAST(strftime('%Y', G.fecha) AS INTEGER) "AÑO"
-                FROM GASTOS G
-                JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
-                WHERE "MES" = :mes AND "AÑO" = :año
-                GROUP BY "USUARIO"
-                ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
-                """,
-                (mes, año,),
-            )
-            datos = cursor.fetchall()
-            cursor.close()
-            cerrar_bd(conexion)
-
-            if len(datos) == 0:
-                entry_frecuencia["state"] = "normal"
-                entry_frecuencia.delete(0, "end")
-                entry_frecuencia.insert(0, "—")
-                entry_frecuencia["state"] = "readonly"
-                
-                entry_frecuencia_mes_pasado["state"] = "normal"
-                entry_frecuencia_mes_pasado.delete(0, "end")
-                entry_frecuencia_mes_pasado.insert(0, "—")
-                entry_frecuencia_mes_pasado["state"] = "readonly"
-            elif len(datos) == 1:
-                entry_frecuencia["state"] = "normal"
-                entry_frecuencia.delete(0, "end")
-                entry_frecuencia.insert(0, f"{mes_actual} | " + str(datos[0][0]) + " | fi: " + str(datos[0][1]))
-                entry_frecuencia["state"] = "readonly"
-                
-                entry_frecuencia_mes_pasado["state"] = "normal"
-                entry_frecuencia_mes_pasado.delete(0, "end")
-                entry_frecuencia_mes_pasado.insert(0, "—")
-                entry_frecuencia_mes_pasado["state"] = "readonly"
-            else:
-                entry_frecuencia["state"] = "normal"
-                entry_frecuencia.delete(0, "end")
-                entry_frecuencia.insert(0, f"{mes_actual} | " + str(datos[0][0]) + " | fi: " + str(datos[0][1]))
-                entry_frecuencia["state"] = "readonly"
-                
-                conexion = conectar_bd()
-                if conexion:
-                    mes_p = mes-1
-                    try:
-                        cursor = conexion.cursor()
-                        cursor.execute(
-                            """
-                            SELECT
-                                U.NOMBRE_USUARIO "USUARIO",
-                                COUNT(*) "FRECUENCIA",
-                                SUM(G.MONTO) "GASTO TOTAL",
-                                CAST(strftime('%m', G.fecha) AS INTEGER) "MES",
-                                CAST(strftime('%Y', G.fecha) AS INTEGER) "AÑO"
-                            FROM GASTOS G
-                            JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
-                            WHERE "MES" = :mes_p AND "AÑO" = :año
-                            GROUP BY "USUARIO"
-                            ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
-                            """,
-                            (mes_p, año,),
-                        )
-                        datos = cursor.fetchall()
-                        cursor.close()
-                        cerrar_bd(conexion)
-                        
-                        entry_frecuencia_mes_pasado["state"] = "normal"
-                        entry_frecuencia_mes_pasado.delete(0, "end")
-                        entry_frecuencia_mes_pasado.insert(0, f"{mes_pasado} | " + str(datos[0][0]) + " | fi: " + str(datos[0][1]))
-                        entry_frecuencia_mes_pasado["state"] = "readonly"
-                        
-                    except Exception as ex:
-                        cerrar_bd(conexion)
-                        messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
-                    
-        except Exception as ex:
-            cerrar_bd(conexion)
-            messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
-    
-    conexion1 = conectar_bd()
-    if conexion1:
-        try:
-            cursor = conexion1.cursor()
-            cursor.execute(
-                """
-                SELECT
-                    U.NOMBRE_USUARIO "USUARIO",
-                    COUNT(*) "FRECUENCIA",
-                    SUM(G.MONTO) "GASTO TOTAL",
-                    CAST(strftime('%Y', G.fecha) AS INTEGER) "AÑO"
-                FROM GASTOS G
-                JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
-                WHERE "AÑO" = :año
-                GROUP BY "USUARIO"
-                ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
-                """,
-                (año,),
-            )
-            datos = cursor.fetchall()
-            cursor.close()
-            
-            cerrar_bd(conexion1)
-            
-            if datos[0][0] is None:
-                entry_frecuencia_promedio["state"] = "normal"
-                entry_frecuencia_promedio.delete(0, "end")
-                entry_frecuencia_promedio.insert(0, "—")
-                entry_frecuencia_promedio["state"] = "readonly"
-                
-                entry_frecuencia_año["state"] = "normal"
-                entry_frecuencia_año.delete(0, "end")
-                entry_frecuencia_año.insert(0, "—")
-                entry_frecuencia_año["state"] = "readonly"
-            else:
-                promedio = datos[0][1]/mes
-                entry_frecuencia_promedio["state"] = "normal"
-                entry_frecuencia_promedio.delete(0, "end")
-                entry_frecuencia_promedio.insert(0, f"{año} | " + str(datos[0][0]) + " | fi: " + str(int(promedio)) + "/mes")
-                entry_frecuencia_promedio["state"] = "readonly"
-                
-                entry_frecuencia_año["state"] = "normal"
-                entry_frecuencia_año.delete(0, "end")
-                entry_frecuencia_año.insert(0, f"{año} | " + str(datos[0][0]) + " |  fi: " + str(datos[0][1]) + "/año")
-                entry_frecuencia_año["state"] = "readonly"
-            
-        except Exception as ex:
-            cerrar_bd(conexion1)
-            messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
-    
-    conexion2 = conectar_bd()
-    if conexion2:
-        try:
-            cursor = conexion2.cursor()
-            cursor.execute(
-                """
-                SELECT
-                    U.NOMBRE_USUARIO "USUARIO",
-                    SUM(G.MONTO) "GASTO TOTAL",
-                    CAST(strftime('%m', G.fecha) AS INTEGER) "MES",
-                    CAST(strftime('%Y', G.fecha) AS INTEGER) "AÑO"
-                FROM GASTOS G
-                JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
-                WHERE "MES" = :mes AND "AÑO" = :año
-                GROUP BY "USUARIO"
-                ORDER BY "GASTO TOTAL" DESC
-                """,
-                (mes, año,),
-            )
-            datos = cursor.fetchall()
-            cursor.close()
-            cerrar_bd(conexion2)
-            
-            if len(datos) == 0:
-                entry_mas_gastos["state"] = "normal"
-                entry_mas_gastos.delete(0, "end")
-                entry_mas_gastos.insert(0, "—")
-                entry_mas_gastos["state"] = "readonly"
-                
-                entry_mas_gastos_pasado["state"] = "normal"
-                entry_mas_gastos_pasado.delete(0, "end")
-                entry_mas_gastos_pasado.insert(0, "—")
-                entry_mas_gastos_pasado["state"] = "readonly"
-            else:
-                entry_mas_gastos["state"] = "normal"
-                entry_mas_gastos.delete(0, "end")
-                entry_mas_gastos.insert(0, f"{mes_actual} | " + str(datos[0][0]) + " | S/. " + str(datos[0][1]))
-                entry_mas_gastos["state"] = "readonly"
-                
-                conexion = conectar_bd()
-                if conexion:
-                    mes_p = mes-1
-                    try:
-                        cursor = conexion.cursor()
-                        cursor.execute(
-                            """
-                            SELECT
-                                U.NOMBRE_USUARIO "USUARIO",
-                                SUM(G.MONTO) "GASTO TOTAL",
-                                CAST(strftime('%m', G.fecha) AS INTEGER) "MES",
-                                CAST(strftime('%Y', G.fecha) AS INTEGER) "AÑO"
-                            FROM GASTOS G
-                            JOIN USUARIOS U ON U.USUARIO = G.USUARIOS_USUARIO
-                            WHERE "MES" = :mes_p AND "AÑO" = :año
-                            GROUP BY "USUARIO"
-                            ORDER BY "GASTO TOTAL" DESC
-                            """,
-                            (mes_p, año,),
-                        )
-                        datos = cursor.fetchall()
-                        cursor.close()
-                        cerrar_bd(conexion)
-                        
-                        entry_mas_gastos_pasado["state"] = "normal"
-                        entry_mas_gastos_pasado.delete(0, "end")
-                        entry_mas_gastos_pasado.insert(0, f"{mes_pasado} | " + str(datos[0][0]) + " | S/. " + str(datos[0][1]))
-                        entry_mas_gastos_pasado["state"] = "readonly"
-                    except Exception as ex:
-                        cerrar_bd(conexion)
-                        messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
-                        
-        except Exception as ex:
-            cerrar_bd(conexion2)
-            messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+    pass
 
 label_frecuencia = ttk.Label(tab_2, text="Frecuencia Mes Actual:")
 label_frecuencia.grid(row=0, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
