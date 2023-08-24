@@ -1457,7 +1457,6 @@ def reporte_gastos():
             entry_gasto_mes_pasado.insert(0, 0.0)
             entry_gasto_mes_pasado["state"] = "readonly"
             
-            
         elif len(gasto_mes) > 1 and gasto_mes[0][1] == mes and gasto_mes[1][1] == mes-1:
             entry_gasto_mes["state"] = "normal"
             entry_gasto_mes.delete(0, "end")
@@ -1468,7 +1467,6 @@ def reporte_gastos():
             entry_gasto_mes_pasado.delete(0, "end")
             entry_gasto_mes_pasado.insert(0, f"{mes_pasado}   |   S/. " + str(round(gasto_mes[1][0],2)))
             entry_gasto_mes_pasado["state"] = "readonly"
-            
             
         elif (len(gasto_mes) == 1 and gasto_mes[0][1] == mes) or (len(gasto_mes) > 1 and gasto_mes[0][1] == mes and gasto_mes[1][1] != mes-1):
             entry_gasto_mes["state"] = "normal"
@@ -1481,7 +1479,6 @@ def reporte_gastos():
             entry_gasto_mes_pasado.insert(0, 0.0)
             entry_gasto_mes_pasado["state"] = "readonly"
             
-            
         elif (len(gasto_mes) == 1 and gasto_mes[0][1] == mes-1) or (len(gasto_mes) > 1 and gasto_mes[0][1] != mes and gasto_mes[1][1] == mes-1):
             entry_gasto_mes["state"] = "normal"
             entry_gasto_mes.delete(0, "end")
@@ -1492,9 +1489,7 @@ def reporte_gastos():
             entry_gasto_mes_pasado.delete(0, "end")
             entry_gasto_mes_pasado.insert(0, f"{mes_pasado}   |   S/. " + str(round(gasto_mes[0][0],2)))
             entry_gasto_mes_pasado["state"] = "readonly"
-                
-            
-                         
+                       
         conexion1 = conectar_bd()
         if conexion1:
             try:
@@ -2149,15 +2144,16 @@ def reporte_bancos():
             cursor.execute(
                 """
                 SELECT
-                    E.NOMBRE_EST "ESTABLECIMIENTO",
+                    B.NOMBRE_BANCO "BANCO",
                     COUNT(*) "FRECUENCIA",
                     SUM(G.MONTO) "GASTO TOTAL",
                     CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
                     CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
                 FROM GASTOS G
-                JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                JOIN TARJETAS T ON T.NRO_TARJETA = G.TARJETAS_NRO_TARJETA
+                JOIN BANCOS B ON B.BANCO = T.BANCOS_BANCO
                 WHERE "MES" = :mes AND "AÑO" = :año
-                GROUP BY "ESTABLECIMIENTO"
+                GROUP BY "BANCO"
                 ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
                 """,
                 (mes, año,),
@@ -2182,15 +2178,16 @@ def reporte_bancos():
                 cursor.execute(
                     """
                     SELECT
-                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        B.NOMBRE_BANCO "BANCO",
                         COUNT(*) "FRECUENCIA",
                         SUM(G.MONTO) "GASTO TOTAL",
                         CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
                         CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
                     FROM GASTOS G
-                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    JOIN TARJETAS T ON T.NRO_TARJETA = G.TARJETAS_NRO_TARJETA
+                    JOIN BANCOS B ON B.BANCO = T.BANCOS_BANCO
                     WHERE "MES" = :mes_p AND "AÑO" = :año_pasado
-                    GROUP BY "ESTABLECIMIENTO"
+                    GROUP BY "BANCO"
                     ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
                     """,
                     (mes_p, año_pasado,),
@@ -2254,14 +2251,15 @@ def reporte_bancos():
                 cursor.execute(
                     """
                     SELECT
-                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        B.NOMBRE_BANCO "BANCO",
                         COUNT(*) "FRECUENCIA",
                         SUM(G.MONTO) "GASTO TOTAL",
                         CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
                     FROM GASTOS G
-                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    JOIN TARJETAS T ON T.NRO_TARJETA = G.TARJETAS_NRO_TARJETA
+                    JOIN BANCOS B ON B.BANCO = T.BANCOS_BANCO
                     WHERE "AÑO" = :año
-                    GROUP BY "ESTABLECIMIENTO"
+                    GROUP BY "BANCO"
                     ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
                     """,
                     (año,),
@@ -2304,14 +2302,15 @@ def reporte_bancos():
                 cursor.execute(
                     """
                     SELECT
-                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        B.NOMBRE_BANCO "BANCO",
                         SUM(G.MONTO) "GASTO TOTAL",
                         CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
                         CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
                     FROM GASTOS G
-                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    JOIN TARJETAS T ON T.NRO_TARJETA = G.TARJETAS_NRO_TARJETA
+                    JOIN BANCOS B ON B.BANCO = T.BANCOS_BANCO
                     WHERE "MES" = :mes AND "AÑO" = :año
-                    GROUP BY "ESTABLECIMIENTO"
+                    GROUP BY "BANCO"
                     ORDER BY "GASTO TOTAL" DESC
                     """,
                     (mes, año,),
@@ -2331,14 +2330,15 @@ def reporte_bancos():
                 cursor.execute(
                     """
                     SELECT
-                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        B.NOMBRE_BANCO "BANCO",
                         SUM(G.MONTO) "GASTO TOTAL",
                         CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
                         CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
                     FROM GASTOS G
-                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    JOIN TARJETAS T ON T.NRO_TARJETA = G.TARJETAS_NRO_TARJETA
+                    JOIN BANCOS B ON B.BANCO = T.BANCOS_BANCO
                     WHERE "MES" = :mes_p AND "AÑO" = :año_pasado
-                    GROUP BY "ESTABLECIMIENTO"
+                    GROUP BY "BANCO"
                     ORDER BY "GASTO TOTAL" DESC
                     """,
                     (mes_p, año_pasado,),
@@ -2406,15 +2406,16 @@ def reporte_bancos():
                 cursor.execute(
                     """
                     SELECT
-                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        B.NOMBRE_BANCO "BANCO",
                         COUNT(*) "FRECUENCIA",
                         SUM(G.MONTO) "GASTO TOTAL",
                         CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
                         CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
                     FROM GASTOS G
-                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    JOIN TARJETAS T ON T.NRO_TARJETA = G.TARJETAS_NRO_TARJETA
+                    JOIN BANCOS B ON B.BANCO = T.BANCOS_BANCO
                     WHERE "MES" = :mes_p AND "AÑO" = :año
-                    GROUP BY "ESTABLECIMIENTO"
+                    GROUP BY "BANCO"
                     ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
                     """,
                     (mes_p, año,),
@@ -2478,14 +2479,15 @@ def reporte_bancos():
                 cursor.execute(
                     """
                     SELECT
-                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        B.NOMBRE_BANCO "BANCO",
                         COUNT(*) "FRECUENCIA",
                         SUM(G.MONTO) "GASTO TOTAL",
                         CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
                     FROM GASTOS G
-                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    JOIN TARJETAS T ON T.NRO_TARJETA = G.TARJETAS_NRO_TARJETA
+                    JOIN BANCOS B ON B.BANCO = T.BANCOS_BANCO
                     WHERE "AÑO" = :año
-                    GROUP BY "ESTABLECIMIENTO"
+                    GROUP BY "BANCO"
                     ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
                     """,
                     (año,),
@@ -2528,14 +2530,15 @@ def reporte_bancos():
                 cursor.execute(
                     """
                     SELECT
-                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        B.NOMBRE_BANCO "BANCO",
                         SUM(G.MONTO) "GASTO TOTAL",
                         CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
                         CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
                     FROM GASTOS G
-                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    JOIN TARJETAS T ON T.NRO_TARJETA = G.TARJETAS_NRO_TARJETA
+                    JOIN BANCOS B ON B.BANCO = T.BANCOS_BANCO
                     WHERE "MES" = :mes AND "AÑO" = :año
-                    GROUP BY "ESTABLECIMIENTO"
+                    GROUP BY "BANCO"
                     ORDER BY "GASTO TOTAL" DESC
                     """,
                     (mes, año,),
@@ -2556,14 +2559,15 @@ def reporte_bancos():
                 cursor.execute(
                     """
                     SELECT
-                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        B.NOMBRE_BANCO "BANCO",
                         SUM(G.MONTO) "GASTO TOTAL",
                         CAST(strftime('%m', G.fecha) AS INTEGER) "MES",
                         CAST(strftime('%Y', G.fecha) AS INTEGER) "AÑO"
                     FROM GASTOS G
-                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    JOIN TARJETAS T ON T.NRO_TARJETA = G.TARJETAS_NRO_TARJETA
+                    JOIN BANCOS B ON B.BANCO = T.BANCOS_BANCO
                     WHERE "MES" = :mes_p AND "AÑO" = :año
-                    GROUP BY "ESTABLECIMIENTO"
+                    GROUP BY "BANCO"
                     ORDER BY "GASTO TOTAL" DESC
 
                     """,
