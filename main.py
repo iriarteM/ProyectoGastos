@@ -1215,10 +1215,10 @@ boton_limpiar.grid(row=8, column=2, columnspan=2, padx=(5, 15), pady=(0, 11), st
 
 # FRAME REPORTE #
 frame_reporte = ttk.LabelFrame(frame, text="Resumen de Gastos")
-frame_reporte.grid(row=2, column=0, columnspan=2, padx=(5, 0), pady=(0, 5), sticky="nw")
+frame_reporte.grid(row=2, column=0, columnspan=2, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 frame_total = ttk.Frame(frame_reporte)
-frame_total.grid(row=0, column=0, padx=(20, 10), pady=(5, 10), sticky="nsew")
+frame_total.grid(row=0, column=0, padx=(5, 0), pady=(5, 10), sticky="nsew")
 
 # Notebook
 notebook = ttk.Notebook(frame_total)
@@ -1589,34 +1589,34 @@ def reporte_gastos():
                 messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
                 
 label_gasto_mes = ttk.Label(tab_1, text="Gasto Mes Actual:")
-label_gasto_mes.grid(row=0, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_gasto_mes = ttk.Entry(tab_1, state="disabled", width=20)
-entry_gasto_mes.grid(row=1, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+label_gasto_mes.grid(row=0, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_gasto_mes = ttk.Entry(tab_1, state="disabled", width=27)
+entry_gasto_mes.grid(row=1, column=0, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_gasto_mes_pasado = ttk.Label(tab_1, text="Gasto Mes Pasado:")
-label_gasto_mes_pasado.grid(row=0, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_gasto_mes_pasado = ttk.Entry(tab_1, state="disabled", width=20)
-entry_gasto_mes_pasado.grid(row=1, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+label_gasto_mes_pasado.grid(row=0, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_gasto_mes_pasado = ttk.Entry(tab_1, state="disabled", width=27)
+entry_gasto_mes_pasado.grid(row=1, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_gasto_mes_promedio = ttk.Label(tab_1, text="Gasto Mes Promedio:")
-label_gasto_mes_promedio.grid(row=2, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_gasto_mes_promedio = ttk.Entry(tab_1, state="disabled", width=20)
-entry_gasto_mes_promedio.grid(row=3, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+label_gasto_mes_promedio.grid(row=2, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_gasto_mes_promedio = ttk.Entry(tab_1, state="disabled", width=27)
+entry_gasto_mes_promedio.grid(row=3, column=0, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_gasto_año = ttk.Label(tab_1, text="Gasto Año Actual:")
-label_gasto_año.grid(row=2, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_gasto_año = ttk.Entry(tab_1, state="disabled", width=20)
-entry_gasto_año.grid(row=3, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+label_gasto_año.grid(row=2, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_gasto_año = ttk.Entry(tab_1, state="disabled", width=27)
+entry_gasto_año.grid(row=3, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_gasto_alto = ttk.Label(tab_1, text="Gasto Más Alto (Mes):")
-label_gasto_alto.grid(row=4, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_gasto_alto = ttk.Entry(tab_1, state="disabled", width=20)
-entry_gasto_alto.grid(row=5, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+label_gasto_alto.grid(row=4, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_gasto_alto = ttk.Entry(tab_1, state="disabled", width=27)
+entry_gasto_alto.grid(row=5, column=0, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_gasto_bajo = ttk.Label(tab_1, text="Gasto Más Bajo (Mes):")
-label_gasto_bajo.grid(row=4, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_gasto_bajo = ttk.Entry(tab_1, state="disabled", width=20)
-entry_gasto_bajo.grid(row=5, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+label_gasto_bajo.grid(row=4, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_gasto_bajo = ttk.Entry(tab_1, state="disabled", width=27)
+entry_gasto_bajo.grid(row=5, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 # Tab #2
 tab_2 = ttk.Frame(notebook)
@@ -2102,34 +2102,34 @@ def reporte_usuarios():
             entry_mas_gastos_pasado["state"] = "readonly"
             
 label_frecuencia = ttk.Label(tab_2, text="Frecuencia Mes Actual:")
-label_frecuencia.grid(row=0, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_frecuencia = ttk.Entry(tab_2, state="disabled", width=20)
-entry_frecuencia.grid(row=1, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+label_frecuencia.grid(row=0, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia = ttk.Entry(tab_2, state="disabled", width=27)
+entry_frecuencia.grid(row=1, column=0, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_frecuencia_mes_pasado = ttk.Label(tab_2, text="Frecuencia Mes Pasado:")
-label_frecuencia_mes_pasado.grid(row=0, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_frecuencia_mes_pasado = ttk.Entry(tab_2, state="disabled", width=20)
-entry_frecuencia_mes_pasado.grid(row=1, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+label_frecuencia_mes_pasado.grid(row=0, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_mes_pasado = ttk.Entry(tab_2, state="disabled", width=27)
+entry_frecuencia_mes_pasado.grid(row=1, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_frecuencia_promedio = ttk.Label(tab_2, text="Frecuencia Mes Promedio:")
-label_frecuencia_promedio.grid(row=2, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_frecuencia_promedio = ttk.Entry(tab_2, state="disabled", width=20)
-entry_frecuencia_promedio.grid(row=3, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+label_frecuencia_promedio.grid(row=2, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_promedio = ttk.Entry(tab_2, state="disabled", width=27)
+entry_frecuencia_promedio.grid(row=3, column=0, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_frecuencia_año = ttk.Label(tab_2, text="Frecuencia Año Actual:")
-label_frecuencia_año.grid(row=2, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_frecuencia_año = ttk.Entry(tab_2, state="disabled", width=20)
-entry_frecuencia_año.grid(row=3, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+label_frecuencia_año.grid(row=2, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_año = ttk.Entry(tab_2, state="disabled", width=27)
+entry_frecuencia_año.grid(row=3, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_mas_gastos = ttk.Label(tab_2, text="+ Gastos Mes Actual:")
-label_mas_gastos.grid(row=4, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_mas_gastos = ttk.Entry(tab_2, state="disabled", width=20)
-entry_mas_gastos.grid(row=5, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+label_mas_gastos.grid(row=4, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_mas_gastos = ttk.Entry(tab_2, state="disabled", width=27)
+entry_mas_gastos.grid(row=5, column=0, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_mas_gastos_pasado = ttk.Label(tab_2, text="+ Gastos Mes Pasado:")
-label_mas_gastos_pasado.grid(row=4, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_mas_gastos_pasado = ttk.Entry(tab_2, state="disabled", width=20)
-entry_mas_gastos_pasado.grid(row=5, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+label_mas_gastos_pasado.grid(row=4, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_mas_gastos_pasado = ttk.Entry(tab_2, state="disabled", width=27)
+entry_mas_gastos_pasado.grid(row=5, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 
 # Tab #3
@@ -2626,34 +2626,34 @@ def reporte_bancos():
             entry_mas_gastos_banco_pasado["state"] = "readonly"
 
 label_frecuencia_banco = ttk.Label(tab_3, text="Frecuencia Mes Actual:")
-label_frecuencia_banco.grid(row=0, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_frecuencia_banco = ttk.Entry(tab_3, state="disabled", width=20)
-entry_frecuencia_banco.grid(row=1, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+label_frecuencia_banco.grid(row=0, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_banco = ttk.Entry(tab_3, state="disabled", width=27)
+entry_frecuencia_banco.grid(row=1, column=0, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_frecuencia_banco_mes_pasado = ttk.Label(tab_3, text="Frecuencia Mes Pasado:")
-label_frecuencia_banco_mes_pasado.grid(row=0, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_frecuencia_banco_mes_pasado = ttk.Entry(tab_3, state="disabled", width=20)
-entry_frecuencia_banco_mes_pasado.grid(row=1, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+label_frecuencia_banco_mes_pasado.grid(row=0, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_banco_mes_pasado = ttk.Entry(tab_3, state="disabled", width=27)
+entry_frecuencia_banco_mes_pasado.grid(row=1, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_frecuencia_banco_promedio = ttk.Label(tab_3, text="Frecuencia Mes Promedio:")
-label_frecuencia_banco_promedio.grid(row=2, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_frecuencia_banco_promedio = ttk.Entry(tab_3, state="disabled", width=20)
-entry_frecuencia_banco_promedio.grid(row=3, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+label_frecuencia_banco_promedio.grid(row=2, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_banco_promedio = ttk.Entry(tab_3, state="disabled", width=27)
+entry_frecuencia_banco_promedio.grid(row=3, column=0, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_frecuencia_banco_año = ttk.Label(tab_3, text="Frecuencia Año Actual:")
-label_frecuencia_banco_año.grid(row=2, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_frecuencia_banco_año = ttk.Entry(tab_3, state="disabled", width=20)
-entry_frecuencia_banco_año.grid(row=3, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+label_frecuencia_banco_año.grid(row=2, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_banco_año = ttk.Entry(tab_3, state="disabled", width=27)
+entry_frecuencia_banco_año.grid(row=3, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_mas_gastos_banco = ttk.Label(tab_3, text="+ Gastos Mes Actual:")
-label_mas_gastos_banco.grid(row=4, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_mas_gastos_banco = ttk.Entry(tab_3, state="disabled", width=20)
-entry_mas_gastos_banco.grid(row=5, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+label_mas_gastos_banco.grid(row=4, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_mas_gastos_banco = ttk.Entry(tab_3, state="disabled", width=27)
+entry_mas_gastos_banco.grid(row=5, column=0, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_mas_gastos_banco_pasado = ttk.Label(tab_3, text="+ Gastos Mes Pasado:")
-label_mas_gastos_banco_pasado.grid(row=4, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_mas_gastos_banco_pasado = ttk.Entry(tab_3, state="disabled", width=20)
-entry_mas_gastos_banco_pasado.grid(row=5, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+label_mas_gastos_banco_pasado.grid(row=4, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_mas_gastos_banco_pasado = ttk.Entry(tab_3, state="disabled", width=27)
+entry_mas_gastos_banco_pasado.grid(row=5, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 
 # Tab #4
@@ -3141,34 +3141,34 @@ def reporte_establecimientos():
             entry_mas_gastos_est_pasado["state"] = "readonly"
 
 label_frecuencia_est = ttk.Label(tab_4, text="Frecuencia Mes Actual:")
-label_frecuencia_est.grid(row=0, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_frecuencia_est = ttk.Entry(tab_4, state="disabled", width=20)
-entry_frecuencia_est.grid(row=1, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+label_frecuencia_est.grid(row=0, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_est = ttk.Entry(tab_4, state="disabled", width=27)
+entry_frecuencia_est.grid(row=1, column=0, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_frecuencia_est_mes_pasado = ttk.Label(tab_4, text="Frecuencia Mes Pasado:")
-label_frecuencia_est_mes_pasado.grid(row=0, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_frecuencia_est_mes_pasado = ttk.Entry(tab_4, state="disabled", width=20)
-entry_frecuencia_est_mes_pasado.grid(row=1, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+label_frecuencia_est_mes_pasado.grid(row=0, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_est_mes_pasado = ttk.Entry(tab_4, state="disabled", width=27)
+entry_frecuencia_est_mes_pasado.grid(row=1, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_frecuencia_est_promedio = ttk.Label(tab_4, text="Frecuencia Mes Promedio:")
-label_frecuencia_est_promedio.grid(row=2, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_frecuencia_est_promedio = ttk.Entry(tab_4, state="disabled", width=20)
-entry_frecuencia_est_promedio.grid(row=3, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+label_frecuencia_est_promedio.grid(row=2, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_est_promedio = ttk.Entry(tab_4, state="disabled", width=27)
+entry_frecuencia_est_promedio.grid(row=3, column=0, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_frecuencia_est_año = ttk.Label(tab_4, text="Frecuencia Año Actual:")
-label_frecuencia_est_año.grid(row=2, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_frecuencia_est_año = ttk.Entry(tab_4, state="disabled", width=20)
-entry_frecuencia_est_año.grid(row=3, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+label_frecuencia_est_año.grid(row=2, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_est_año = ttk.Entry(tab_4, state="disabled", width=27)
+entry_frecuencia_est_año.grid(row=3, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_mas_gastos_est = ttk.Label(tab_4, text="+ Gastos Mes Actual:")
-label_mas_gastos_est.grid(row=4, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_mas_gastos_est = ttk.Entry(tab_4, state="disabled", width=20)
-entry_mas_gastos_est.grid(row=5, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+label_mas_gastos_est.grid(row=4, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_mas_gastos_est = ttk.Entry(tab_4, state="disabled", width=27)
+entry_mas_gastos_est.grid(row=5, column=0, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 label_mas_gastos_est_pasado = ttk.Label(tab_4, text="+ Gastos Mes Pasado:")
-label_mas_gastos_est_pasado.grid(row=4, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_mas_gastos_est_pasado = ttk.Entry(tab_4, state="disabled", width=20)
-entry_mas_gastos_est_pasado.grid(row=5, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+label_mas_gastos_est_pasado.grid(row=4, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
+entry_mas_gastos_est_pasado = ttk.Entry(tab_4, state="disabled", width=27)
+entry_mas_gastos_est_pasado.grid(row=5, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
 notebook.pack(expand=True, fill="both", padx=5, pady=0)
 
@@ -3178,7 +3178,7 @@ separador.grid(row=0, column=1, padx=(15, 15), pady=(5, 10), sticky="nsew")
 
 # FRAME FACTURACIÓN #
 frame_facturacion = ttk.LabelFrame(frame_reporte, text="Periodo de Facturación")
-frame_facturacion.grid(row=0, column=2, padx=(15, 20), pady=(0, 10), sticky="nsew")
+frame_facturacion.grid(row=0, column=2, padx=(5, 5), pady=(0, 10), sticky="nsew")
 
 label_inicio = ttk.Label(frame_facturacion, text="Fecha Inicio:")
 label_inicio.grid(row=0, column=0, padx=(15, 15), pady=(5, 0), sticky="nsew")
@@ -3210,7 +3210,7 @@ entry_promedio = ttk.Entry(frame_facturacion, state="disabled", width=10)
 entry_promedio.grid(row=5, column=0, padx=(15, 15), pady=(0, 15), sticky="nsew")
 
 
-boton_generar_reporte = ttk.Button(frame_facturacion, text="Generar Reporte")
+boton_generar_reporte = ttk.Button(frame_facturacion, text="Excel")
 boton_generar_reporte.grid(row=5, column=1, padx=(0, 15), pady=(0, 15), sticky="n")
 
 
