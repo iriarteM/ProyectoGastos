@@ -36,8 +36,8 @@ def actualizar():
     
     reporte_gastos()
     reporte_usuarios()
-    #reporte_bancos()
-    #reporte_establecimientos()
+    reporte_bancos()
+    reporte_establecimientos()
     
     consulta = """
         SELECT
@@ -1212,7 +1212,7 @@ boton_filtrar.grid(row=8, column=0, columnspan=2, padx=(15, 0), pady=(0, 11), st
 boton_limpiar = ttk.Button(frame_filtros, text="Limpiar", width=6, command=actualizar)
 boton_limpiar.grid(row=8, column=2, columnspan=2, padx=(5, 15), pady=(0, 11), sticky="nsew")
 
-#######################################################################################################################
+
 # FRAME REPORTE #
 frame_reporte = ttk.LabelFrame(frame, text="Resumen de Gastos")
 frame_reporte.grid(row=2, column=0, columnspan=2, padx=(5, 0), pady=(0, 5), sticky="nw")
@@ -1238,10 +1238,8 @@ meses = {
     12: "DIC"
 }
 fecha_actual = datetime.now().date()
-#mes = fecha_actual.month
-#año = fecha_actual.year
-mes = 2
-año = 2023
+mes = fecha_actual.month
+año = fecha_actual.year
 mes_actual = meses[mes]
     
 # Tab #1
@@ -1448,7 +1446,7 @@ def reporte_gastos():
     else:
         mes_pasado = meses[mes-1]
 
-        if len(gasto_mes) == 0:
+        if (len(gasto_mes) == 0) or (len(gasto_mes) > 1 and gasto_mes[0][1] != mes and gasto_mes[1][1] != mes-1):
             entry_gasto_mes["state"] = "normal"
             entry_gasto_mes.delete(0, "end")
             entry_gasto_mes.insert(0, 0.0)
@@ -1459,29 +1457,8 @@ def reporte_gastos():
             entry_gasto_mes_pasado.insert(0, 0.0)
             entry_gasto_mes_pasado["state"] = "readonly"
             
-        elif len(gasto_mes) == 1:
-            entry_gasto_mes["state"] = "normal"
-            entry_gasto_mes.delete(0, "end")
-            entry_gasto_mes.insert(0, f"{mes_actual}   |   S/. " + str(round(gasto_mes[0][0],2)))
-            entry_gasto_mes["state"] = "readonly"
             
-            entry_gasto_mes_pasado["state"] = "normal"
-            entry_gasto_mes_pasado.delete(0, "end")
-            entry_gasto_mes_pasado.insert(0, 0.0)
-            entry_gasto_mes_pasado["state"] = "readonly"
-            
-        elif len(gasto_mes) > 1 and gasto_mes[1][1] != mes-1:
-            entry_gasto_mes["state"] = "normal"
-            entry_gasto_mes.delete(0, "end")
-            entry_gasto_mes.insert(0, f"{mes_actual}   |   S/. " + str(round(gasto_mes[0][0],2)))
-            entry_gasto_mes["state"] = "readonly"
-            
-            entry_gasto_mes_pasado["state"] = "normal"
-            entry_gasto_mes_pasado.delete(0, "end")
-            entry_gasto_mes_pasado.insert(0, 0.0)
-            entry_gasto_mes_pasado["state"] = "readonly"
-            
-        else:
+        elif len(gasto_mes) > 1 and gasto_mes[0][1] == mes and gasto_mes[1][1] == mes-1:
             entry_gasto_mes["state"] = "normal"
             entry_gasto_mes.delete(0, "end")
             entry_gasto_mes.insert(0, f"{mes_actual}   |   S/. " + str(round(gasto_mes[0][0],2)))
@@ -1491,7 +1468,33 @@ def reporte_gastos():
             entry_gasto_mes_pasado.delete(0, "end")
             entry_gasto_mes_pasado.insert(0, f"{mes_pasado}   |   S/. " + str(round(gasto_mes[1][0],2)))
             entry_gasto_mes_pasado["state"] = "readonly"
-                            
+            
+            
+        elif (len(gasto_mes) == 1 and gasto_mes[0][1] == mes) or (len(gasto_mes) > 1 and gasto_mes[0][1] == mes and gasto_mes[1][1] != mes-1):
+            entry_gasto_mes["state"] = "normal"
+            entry_gasto_mes.delete(0, "end")
+            entry_gasto_mes.insert(0, f"{mes_actual}   |   S/. " + str(round(gasto_mes[0][0],2)))
+            entry_gasto_mes["state"] = "readonly"
+            
+            entry_gasto_mes_pasado["state"] = "normal"
+            entry_gasto_mes_pasado.delete(0, "end")
+            entry_gasto_mes_pasado.insert(0, 0.0)
+            entry_gasto_mes_pasado["state"] = "readonly"
+            
+            
+        elif (len(gasto_mes) == 1 and gasto_mes[0][1] == mes-1) or (len(gasto_mes) > 1 and gasto_mes[0][1] != mes and gasto_mes[1][1] == mes-1):
+            entry_gasto_mes["state"] = "normal"
+            entry_gasto_mes.delete(0, "end")
+            entry_gasto_mes.insert(0, 0.0)
+            entry_gasto_mes["state"] = "readonly"
+            
+            entry_gasto_mes_pasado["state"] = "normal"
+            entry_gasto_mes_pasado.delete(0, "end")
+            entry_gasto_mes_pasado.insert(0, f"{mes_pasado}   |   S/. " + str(round(gasto_mes[0][0],2)))
+            entry_gasto_mes_pasado["state"] = "readonly"
+                
+            
+                         
         conexion1 = conectar_bd()
         if conexion1:
             try:
@@ -1623,7 +1626,6 @@ entry_gasto_bajo.grid(row=5, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew"
 # Tab #2
 tab_2 = ttk.Frame(notebook)
 notebook.add(tab_2, text="Usuarios")
-
 
 def reporte_usuarios():
     conexion = conectar_bd()
@@ -2139,70 +2141,1030 @@ entry_mas_gastos_pasado.grid(row=5, column=1, padx=(20, 15), pady=(0, 5), sticky
 tab_3 = ttk.Frame(notebook)
 notebook.add(tab_3, text="Bancos")
 
-label_frecuencia = ttk.Label(tab_3, text="Frecuencia Mes Actual:")
-label_frecuencia.grid(row=0, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_frecuencia = ttk.Entry(tab_3, state="disabled", width=20)
-entry_frecuencia.grid(row=1, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+def reporte_bancos():
+    conexion = conectar_bd()
+    if conexion:
+        try:
+            cursor = conexion.cursor()
+            cursor.execute(
+                """
+                SELECT
+                    E.NOMBRE_EST "ESTABLECIMIENTO",
+                    COUNT(*) "FRECUENCIA",
+                    SUM(G.MONTO) "GASTO TOTAL",
+                    CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
+                    CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                FROM GASTOS G
+                JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                WHERE "MES" = :mes AND "AÑO" = :año
+                GROUP BY "ESTABLECIMIENTO"
+                ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
+                """,
+                (mes, año,),
+            )
+            datos1 = cursor.fetchall()
+            cursor.close()
+            cerrar_bd(conexion)
+            
+        except Exception as ex:
+            cerrar_bd(conexion)
+            messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+            
+    if mes == 1:
+        mes_pasado = meses[12]
+        año_pasado = año-1
+        mes_p = 12
+        
+        conexion = conectar_bd()
+        if conexion:
+            try:
+                cursor = conexion.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        COUNT(*) "FRECUENCIA",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "MES" = :mes_p AND "AÑO" = :año_pasado
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
+                    """,
+                    (mes_p, año_pasado,),
+                )
+                datos2 = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion)
+                
+            except Exception as ex:
+                cerrar_bd(conexion)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                
+        if len(datos1) == 0 and len(datos2) == 0:
+            entry_frecuencia_banco["state"] = "normal"
+            entry_frecuencia_banco.delete(0, "end")
+            entry_frecuencia_banco.insert(0, "—")
+            entry_frecuencia_banco["state"] = "readonly"
+            
+            entry_frecuencia_banco_mes_pasado["state"] = "normal"
+            entry_frecuencia_banco_mes_pasado.delete(0, "end")
+            entry_frecuencia_banco_mes_pasado.insert(0, "—")
+            entry_frecuencia_banco_mes_pasado["state"] = "readonly"
+            
+        elif len(datos1) > 0 and len(datos2) == 0:
+            entry_frecuencia_banco["state"] = "normal"
+            entry_frecuencia_banco.delete(0, "end")
+            entry_frecuencia_banco.insert(0, f"{mes_actual} | " + str(datos1[0][0]) + " | fi: " + str(datos1[0][1]))
+            entry_frecuencia_banco["state"] = "readonly"
 
-label_frecuencia_mes_pasado = ttk.Label(tab_3, text="Frecuencia Mes Pasado:")
-label_frecuencia_mes_pasado.grid(row=0, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_frecuencia_mes_pasado = ttk.Entry(tab_3, state="disabled", width=20)
-entry_frecuencia_mes_pasado.grid(row=1, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+            entry_frecuencia_banco_mes_pasado["state"] = "normal"
+            entry_frecuencia_banco_mes_pasado.delete(0, "end")
+            entry_frecuencia_banco_mes_pasado.insert(0, "—")
+            entry_frecuencia_banco_mes_pasado["state"] = "readonly"
+            
+        elif len(datos1) == 0 and len(datos2) > 0:
+            entry_frecuencia_banco["state"] = "normal"
+            entry_frecuencia_banco.delete(0, "end")
+            entry_frecuencia_banco.insert(0, "—")
+            entry_frecuencia_banco["state"] = "readonly"
 
-label_frecuencia_promedio = ttk.Label(tab_3, text="Frecuencia Mes Promedio:")
-label_frecuencia_promedio.grid(row=2, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_frecuencia_promedio = ttk.Entry(tab_3, state="disabled", width=20)
-entry_frecuencia_promedio.grid(row=3, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+            entry_frecuencia_banco_mes_pasado["state"] = "normal"
+            entry_frecuencia_banco_mes_pasado.delete(0, "end")
+            entry_frecuencia_banco_mes_pasado.insert(0, f"{mes_pasado} | " + str(datos2[0][0]) + " | fi: " + str(datos2[0][1]))
+            entry_frecuencia_banco_mes_pasado["state"] = "readonly"
+            
+        elif len(datos1) > 0 and len(datos2) > 0:
+            entry_frecuencia_banco["state"] = "normal"
+            entry_frecuencia_banco.delete(0, "end")
+            entry_frecuencia_banco.insert(0, f"{mes_actual} | " + str(datos1[0][0]) + " | fi: " + str(datos1[0][1]))
+            entry_frecuencia_banco["state"] = "readonly"
 
-label_frecuencia_año = ttk.Label(tab_3, text="Frecuencia Año Actual:")
-label_frecuencia_año.grid(row=2, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_frecuencia_año = ttk.Entry(tab_3, state="disabled", width=20)
-entry_frecuencia_año.grid(row=3, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+            entry_frecuencia_banco_mes_pasado["state"] = "normal"
+            entry_frecuencia_banco_mes_pasado.delete(0, "end")
+            entry_frecuencia_banco_mes_pasado.insert(0, f"{mes_pasado} | " + str(datos2[0][0]) + " | fi: " + str(datos2[0][1]))
+            entry_frecuencia_banco_mes_pasado["state"] = "readonly"
+            
+        conexion1 = conectar_bd()
+        if conexion1:
+            try:
+                cursor = conexion1.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        COUNT(*) "FRECUENCIA",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "AÑO" = :año
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
+                    """,
+                    (año,),
+                )
+                datos3 = cursor.fetchall()
+                cursor.close()
+                
+                cerrar_bd(conexion1)
+                
+                if len(datos3) == 0:
+                    entry_frecuencia_banco_promedio["state"] = "normal"
+                    entry_frecuencia_banco_promedio.delete(0, "end")
+                    entry_frecuencia_banco_promedio.insert(0, "—")
+                    entry_frecuencia_banco_promedio["state"] = "readonly"
+                    
+                    entry_frecuencia_banco_año["state"] = "normal"
+                    entry_frecuencia_banco_año.delete(0, "end")
+                    entry_frecuencia_banco_año.insert(0, "—")
+                    entry_frecuencia_banco_año["state"] = "readonly"
+                else:
+                    promedio = datos3[0][1]/mes
+                    entry_frecuencia_banco_promedio["state"] = "normal"
+                    entry_frecuencia_banco_promedio.delete(0, "end")
+                    entry_frecuencia_banco_promedio.insert(0, f"{año} | " + str(datos3[0][0]) + " | fi: " + str(round((promedio),2)) + "/mes")
+                    entry_frecuencia_banco_promedio["state"] = "readonly"
+                    
+                    entry_frecuencia_banco_año["state"] = "normal"
+                    entry_frecuencia_banco_año.delete(0, "end")
+                    entry_frecuencia_banco_año.insert(0, f"{año} | " + str(datos3[0][0]) + " |  fi: " + str(datos3[0][1]) + "/año")
+                    entry_frecuencia_banco_año["state"] = "readonly"
+                
+            except Exception as ex:
+                cerrar_bd(conexion1)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+        
+        conexion2 = conectar_bd()
+        if conexion2:
+            try:
+                cursor = conexion2.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "MES" = :mes AND "AÑO" = :año
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "GASTO TOTAL" DESC
+                    """,
+                    (mes, año,),
+                )
+                datos_ = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion2)
+                
+            except Exception as ex:
+                cerrar_bd(conexion2)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                
+        conexion3 = conectar_bd()
+        if conexion3:
+            try:
+                cursor = conexion3.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "MES" = :mes_p AND "AÑO" = :año_pasado
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "GASTO TOTAL" DESC
+                    """,
+                    (mes_p, año_pasado,),
+                )
+                datos_p = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion3)
+                
+            except Exception as ex:
+                cerrar_bd(conexion3)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                
+        if len(datos_) == 0 and len(datos_p) == 0:
+            entry_mas_gastos_banco["state"] = "normal"
+            entry_mas_gastos_banco.delete(0, "end")
+            entry_mas_gastos_banco.insert(0, "—")
+            entry_mas_gastos_banco["state"] = "readonly"
+            
+            entry_mas_gastos_banco_pasado["state"] = "normal"
+            entry_mas_gastos_banco_pasado.delete(0, "end")
+            entry_mas_gastos_banco_pasado.insert(0, "—")
+            entry_mas_gastos_banco_pasado["state"] = "readonly"
+            
+        elif len(datos_) > 0 and len(datos_p) == 0:
+            entry_mas_gastos_banco["state"] = "normal"
+            entry_mas_gastos_banco.delete(0, "end")
+            entry_mas_gastos_banco.insert(0, f"{mes_actual} | " + str(datos_[0][0]) + " | S/. " + str(round(datos_[0][1],2)))
+            entry_mas_gastos_banco["state"] = "readonly"
+            
+            entry_mas_gastos_banco_pasado["state"] = "normal"
+            entry_mas_gastos_banco_pasado.delete(0, "end")
+            entry_mas_gastos_banco_pasado.insert(0, "—")
+            entry_mas_gastos_banco_pasado["state"] = "readonly"
+            
+        elif len(datos_) == 0 and len(datos_p) > 0:
+            entry_mas_gastos_banco["state"] = "normal"
+            entry_mas_gastos_banco.delete(0, "end")
+            entry_mas_gastos_banco.insert(0, "—")
+            entry_mas_gastos_banco["state"] = "readonly"
+            
+            entry_mas_gastos_banco_pasado["state"] = "normal"
+            entry_mas_gastos_banco_pasado.delete(0, "end")
+            entry_mas_gastos_banco_pasado.insert(0, f"{mes_pasado} | " + str(datos_p[0][0]) + " | S/. " + str(round(datos_p[0][1],2)))
+            entry_mas_gastos_banco_pasado["state"] = "readonly"
+            
+        elif len(datos_) > 0 and len(datos_p) > 0:
+            entry_mas_gastos_banco["state"] = "normal"
+            entry_mas_gastos_banco.delete(0, "end")
+            entry_mas_gastos_banco.insert(0, f"{mes_actual} | " + str(datos_[0][0]) + " | S/. " + str(round(datos_[0][1],2)))
+            entry_mas_gastos_banco["state"] = "readonly"
+            
+            entry_mas_gastos_banco_pasado["state"] = "normal"
+            entry_mas_gastos_banco_pasado.delete(0, "end")
+            entry_mas_gastos_banco_pasado.insert(0, f"{mes_pasado} | " + str(datos_p[0][0]) + " | S/. " + str(round(datos_p[0][1],2)))
+            entry_mas_gastos_banco_pasado["state"] = "readonly"
+            
+    else:
+        mes_pasado = meses[mes-1]
+        
+        conexion = conectar_bd()
+        if conexion:
+            mes_p = mes-1
+            try:
+                cursor = conexion.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        COUNT(*) "FRECUENCIA",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "MES" = :mes_p AND "AÑO" = :año
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
+                    """,
+                    (mes_p, año,),
+                )
+                datos2 = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion)
+                
+            except Exception as ex:
+                cerrar_bd(conexion)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                    
+        if len(datos1) == 0 and len(datos2) == 0:
+            entry_frecuencia_banco["state"] = "normal"
+            entry_frecuencia_banco.delete(0, "end")
+            entry_frecuencia_banco.insert(0, "—")
+            entry_frecuencia_banco["state"] = "readonly"
+            
+            entry_frecuencia_banco_mes_pasado["state"] = "normal"
+            entry_frecuencia_banco_mes_pasado.delete(0, "end")
+            entry_frecuencia_banco_mes_pasado.insert(0, "—")
+            entry_frecuencia_banco_mes_pasado["state"] = "readonly"
+            
+        elif len(datos1) > 0 and len(datos2) == 0:
+            entry_frecuencia_banco["state"] = "normal"
+            entry_frecuencia_banco.delete(0, "end")
+            entry_frecuencia_banco.insert(0, f"{mes_actual} | " + str(datos1[0][0]) + " | fi: " + str(datos1[0][1]))
+            entry_frecuencia_banco["state"] = "readonly"
 
-label_mas_gastos = ttk.Label(tab_3, text="+ Gastos Mes Actual:")
-label_mas_gastos.grid(row=4, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_mas_gastos = ttk.Entry(tab_3, state="disabled", width=20)
-entry_mas_gastos.grid(row=5, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+            entry_frecuencia_banco_mes_pasado["state"] = "normal"
+            entry_frecuencia_banco_mes_pasado.delete(0, "end")
+            entry_frecuencia_banco_mes_pasado.insert(0, "—")
+            entry_frecuencia_banco_mes_pasado["state"] = "readonly"
+            
+        elif len(datos1) == 0 and len(datos2) > 0:
+            entry_frecuencia_banco["state"] = "normal"
+            entry_frecuencia_banco.delete(0, "end")
+            entry_frecuencia_banco.insert(0, "—")
+            entry_frecuencia_banco["state"] = "readonly"
 
-label_mas_gastos_pasado = ttk.Label(tab_3, text="+ Gastos Mes Pasado:")
-label_mas_gastos_pasado.grid(row=4, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_mas_gastos_pasado = ttk.Entry(tab_3, state="disabled", width=20)
-entry_mas_gastos_pasado.grid(row=5, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+            entry_frecuencia_banco_mes_pasado["state"] = "normal"
+            entry_frecuencia_banco_mes_pasado.delete(0, "end")
+            entry_frecuencia_banco_mes_pasado.insert(0, f"{mes_pasado} | " + str(datos2[0][0]) + " | fi: " + str(datos2[0][1]))
+            entry_frecuencia_banco_mes_pasado["state"] = "readonly"
+            
+        elif len(datos1) > 0 and len(datos2) > 0:
+            entry_frecuencia_banco["state"] = "normal"
+            entry_frecuencia_banco.delete(0, "end")
+            entry_frecuencia_banco.insert(0, f"{mes_actual} | " + str(datos1[0][0]) + " | fi: " + str(datos1[0][1]))
+            entry_frecuencia_banco["state"] = "readonly"
+
+            entry_frecuencia_banco_mes_pasado["state"] = "normal"
+            entry_frecuencia_banco_mes_pasado.delete(0, "end")
+            entry_frecuencia_banco_mes_pasado.insert(0, f"{mes_pasado} | " + str(datos2[0][0]) + " | fi: " + str(datos2[0][1]))
+            entry_frecuencia_banco_mes_pasado["state"] = "readonly"
+                       
+        conexion1 = conectar_bd()
+        if conexion1:
+            try:
+                cursor = conexion1.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        COUNT(*) "FRECUENCIA",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "AÑO" = :año
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
+                    """,
+                    (año,),
+                )
+                datos3 = cursor.fetchall()
+                cursor.close()
+                
+                cerrar_bd(conexion1)
+                
+                if len(datos3) == 0:
+                    entry_frecuencia_banco_promedio["state"] = "normal"
+                    entry_frecuencia_banco_promedio.delete(0, "end")
+                    entry_frecuencia_banco_promedio.insert(0, "—")
+                    entry_frecuencia_banco_promedio["state"] = "readonly"
+                    
+                    entry_frecuencia_banco_año["state"] = "normal"
+                    entry_frecuencia_banco_año.delete(0, "end")
+                    entry_frecuencia_banco_año.insert(0, "—")
+                    entry_frecuencia_banco_año["state"] = "readonly"
+                else:
+                    promedio = datos3[0][1]/mes
+                    entry_frecuencia_banco_promedio["state"] = "normal"
+                    entry_frecuencia_banco_promedio.delete(0, "end")
+                    entry_frecuencia_banco_promedio.insert(0, f"{año} | " + str(datos3[0][0]) + " | fi: " + str(round((promedio),2)) + "/mes")
+                    entry_frecuencia_banco_promedio["state"] = "readonly"
+                    
+                    entry_frecuencia_banco_año["state"] = "normal"
+                    entry_frecuencia_banco_año.delete(0, "end")
+                    entry_frecuencia_banco_año.insert(0, f"{año} | " + str(datos3[0][0]) + " |  fi: " + str(datos3[0][1]) + "/año")
+                    entry_frecuencia_banco_año["state"] = "readonly"
+                
+            except Exception as ex:
+                cerrar_bd(conexion1)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+        
+        conexion2 = conectar_bd()
+        if conexion2:
+            try:
+                cursor = conexion2.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "MES" = :mes AND "AÑO" = :año
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "GASTO TOTAL" DESC
+                    """,
+                    (mes, año,),
+                )
+                datos_ = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion2)
+                
+            except Exception as ex:
+                cerrar_bd(conexion2)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                
+        conexion3 = conectar_bd()
+        if conexion3:
+            mes_p = mes-1
+            try:
+                cursor = conexion3.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.fecha) AS INTEGER) "MES",
+                        CAST(strftime('%Y', G.fecha) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "MES" = :mes_p AND "AÑO" = :año
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "GASTO TOTAL" DESC
+
+                    """,
+                    (mes_p, año,),
+                )
+                datos_p = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion3)
+                
+            except Exception as ex:
+                cerrar_bd(conexion3)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                
+        if len(datos_) == 0 and len(datos_p) == 0:
+            entry_mas_gastos_banco["state"] = "normal"
+            entry_mas_gastos_banco.delete(0, "end")
+            entry_mas_gastos_banco.insert(0, "—")
+            entry_mas_gastos_banco["state"] = "readonly"
+            
+            entry_mas_gastos_banco_pasado["state"] = "normal"
+            entry_mas_gastos_banco_pasado.delete(0, "end")
+            entry_mas_gastos_banco_pasado.insert(0, "—")
+            entry_mas_gastos_banco_pasado["state"] = "readonly"
+            
+        elif len(datos_) > 0 and len(datos_p) == 0:
+            entry_mas_gastos_banco["state"] = "normal"
+            entry_mas_gastos_banco.delete(0, "end")
+            entry_mas_gastos_banco.insert(0, f"{mes_actual} | " + str(datos_[0][0]) + " | S/. " + str(round(datos_[0][1],2)))
+            entry_mas_gastos_banco["state"] = "readonly"
+            
+            entry_mas_gastos_banco_pasado["state"] = "normal"
+            entry_mas_gastos_banco_pasado.delete(0, "end")
+            entry_mas_gastos_banco_pasado.insert(0, "—")
+            entry_mas_gastos_banco_pasado["state"] = "readonly"
+            
+        elif len(datos_) == 0 and len(datos_p) > 0:
+            entry_mas_gastos_banco["state"] = "normal"
+            entry_mas_gastos_banco.delete(0, "end")
+            entry_mas_gastos_banco.insert(0, "—")
+            entry_mas_gastos_banco["state"] = "readonly"
+            
+            entry_mas_gastos_banco_pasado["state"] = "normal"
+            entry_mas_gastos_banco_pasado.delete(0, "end")
+            entry_mas_gastos_banco_pasado.insert(0, f"{mes_pasado} | " + str(datos_p[0][0]) + " | S/. " + str(round(datos_p[0][1],2)))
+            entry_mas_gastos_banco_pasado["state"] = "readonly"
+            
+        elif len(datos_) > 0 and len(datos_p) > 0:
+            entry_mas_gastos_banco["state"] = "normal"
+            entry_mas_gastos_banco.delete(0, "end")
+            entry_mas_gastos_banco.insert(0, f"{mes_actual} | " + str(datos_[0][0]) + " | S/. " + str(round(datos_[0][1],2)))
+            entry_mas_gastos_banco["state"] = "readonly"
+            
+            entry_mas_gastos_banco_pasado["state"] = "normal"
+            entry_mas_gastos_banco_pasado.delete(0, "end")
+            entry_mas_gastos_banco_pasado.insert(0, f"{mes_pasado} | " + str(datos_p[0][0]) + " | S/. " + str(round(datos_p[0][1],2)))
+            entry_mas_gastos_banco_pasado["state"] = "readonly"
+
+label_frecuencia_banco = ttk.Label(tab_3, text="Frecuencia Mes Actual:")
+label_frecuencia_banco.grid(row=0, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_banco = ttk.Entry(tab_3, state="disabled", width=20)
+entry_frecuencia_banco.grid(row=1, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+
+label_frecuencia_banco_mes_pasado = ttk.Label(tab_3, text="Frecuencia Mes Pasado:")
+label_frecuencia_banco_mes_pasado.grid(row=0, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
+entry_frecuencia_banco_mes_pasado = ttk.Entry(tab_3, state="disabled", width=20)
+entry_frecuencia_banco_mes_pasado.grid(row=1, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+
+label_frecuencia_banco_promedio = ttk.Label(tab_3, text="Frecuencia Mes Promedio:")
+label_frecuencia_banco_promedio.grid(row=2, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_banco_promedio = ttk.Entry(tab_3, state="disabled", width=20)
+entry_frecuencia_banco_promedio.grid(row=3, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+
+label_frecuencia_banco_año = ttk.Label(tab_3, text="Frecuencia Año Actual:")
+label_frecuencia_banco_año.grid(row=2, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
+entry_frecuencia_banco_año = ttk.Entry(tab_3, state="disabled", width=20)
+entry_frecuencia_banco_año.grid(row=3, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+
+label_mas_gastos_banco = ttk.Label(tab_3, text="+ Gastos Mes Actual:")
+label_mas_gastos_banco.grid(row=4, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
+entry_mas_gastos_banco = ttk.Entry(tab_3, state="disabled", width=20)
+entry_mas_gastos_banco.grid(row=5, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+
+label_mas_gastos_banco_pasado = ttk.Label(tab_3, text="+ Gastos Mes Pasado:")
+label_mas_gastos_banco_pasado.grid(row=4, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
+entry_mas_gastos_banco_pasado = ttk.Entry(tab_3, state="disabled", width=20)
+entry_mas_gastos_banco_pasado.grid(row=5, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
 
 
 # Tab #4
 tab_4 = ttk.Frame(notebook)
 notebook.add(tab_4, text="Establecimientos")
 
-label_frecuencia = ttk.Label(tab_4, text="Frecuencia Mes Actual:")
-label_frecuencia.grid(row=0, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_frecuencia = ttk.Entry(tab_4, state="disabled", width=20)
-entry_frecuencia.grid(row=1, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+def reporte_establecimientos():
+    conexion = conectar_bd()
+    if conexion:
+        try:
+            cursor = conexion.cursor()
+            cursor.execute(
+                """
+                SELECT
+                    E.NOMBRE_EST "ESTABLECIMIENTO",
+                    COUNT(*) "FRECUENCIA",
+                    SUM(G.MONTO) "GASTO TOTAL",
+                    CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
+                    CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                FROM GASTOS G
+                JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                WHERE "MES" = :mes AND "AÑO" = :año
+                GROUP BY "ESTABLECIMIENTO"
+                ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
+                """,
+                (mes, año,),
+            )
+            datos1 = cursor.fetchall()
+            cursor.close()
+            cerrar_bd(conexion)
+            
+        except Exception as ex:
+            cerrar_bd(conexion)
+            messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+            
+    if mes == 1:
+        mes_pasado = meses[12]
+        año_pasado = año-1
+        mes_p = 12
+        
+        conexion = conectar_bd()
+        if conexion:
+            try:
+                cursor = conexion.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        COUNT(*) "FRECUENCIA",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "MES" = :mes_p AND "AÑO" = :año_pasado
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
+                    """,
+                    (mes_p, año_pasado,),
+                )
+                datos2 = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion)
+                
+            except Exception as ex:
+                cerrar_bd(conexion)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                
+        if len(datos1) == 0 and len(datos2) == 0:
+            entry_frecuencia_est["state"] = "normal"
+            entry_frecuencia_est.delete(0, "end")
+            entry_frecuencia_est.insert(0, "—")
+            entry_frecuencia_est["state"] = "readonly"
+            
+            entry_frecuencia_est_mes_pasado["state"] = "normal"
+            entry_frecuencia_est_mes_pasado.delete(0, "end")
+            entry_frecuencia_est_mes_pasado.insert(0, "—")
+            entry_frecuencia_est_mes_pasado["state"] = "readonly"
+            
+        elif len(datos1) > 0 and len(datos2) == 0:
+            entry_frecuencia_est["state"] = "normal"
+            entry_frecuencia_est.delete(0, "end")
+            entry_frecuencia_est.insert(0, f"{mes_actual} | " + str(datos1[0][0]) + " | fi: " + str(datos1[0][1]))
+            entry_frecuencia_est["state"] = "readonly"
 
-label_frecuencia_mes_pasado = ttk.Label(tab_4, text="Frecuencia Mes Pasado:")
-label_frecuencia_mes_pasado.grid(row=0, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_frecuencia_mes_pasado = ttk.Entry(tab_4, state="disabled", width=20)
-entry_frecuencia_mes_pasado.grid(row=1, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+            entry_frecuencia_est_mes_pasado["state"] = "normal"
+            entry_frecuencia_est_mes_pasado.delete(0, "end")
+            entry_frecuencia_est_mes_pasado.insert(0, "—")
+            entry_frecuencia_est_mes_pasado["state"] = "readonly"
+            
+        elif len(datos1) == 0 and len(datos2) > 0:
+            entry_frecuencia_est["state"] = "normal"
+            entry_frecuencia_est.delete(0, "end")
+            entry_frecuencia_est.insert(0, "—")
+            entry_frecuencia_est["state"] = "readonly"
 
-label_frecuencia_promedio = ttk.Label(tab_4, text="Frecuencia Mes Promedio:")
-label_frecuencia_promedio.grid(row=2, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_frecuencia_promedio = ttk.Entry(tab_4, state="disabled", width=20)
-entry_frecuencia_promedio.grid(row=3, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+            entry_frecuencia_est_mes_pasado["state"] = "normal"
+            entry_frecuencia_est_mes_pasado.delete(0, "end")
+            entry_frecuencia_est_mes_pasado.insert(0, f"{mes_pasado} | " + str(datos2[0][0]) + " | fi: " + str(datos2[0][1]))
+            entry_frecuencia_est_mes_pasado["state"] = "readonly"
+            
+        elif len(datos1) > 0 and len(datos2) > 0:
+            entry_frecuencia_est["state"] = "normal"
+            entry_frecuencia_est.delete(0, "end")
+            entry_frecuencia_est.insert(0, f"{mes_actual} | " + str(datos1[0][0]) + " | fi: " + str(datos1[0][1]))
+            entry_frecuencia_est["state"] = "readonly"
 
-label_frecuencia_año = ttk.Label(tab_4, text="Frecuencia Año Actual:")
-label_frecuencia_año.grid(row=2, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_frecuencia_año = ttk.Entry(tab_4, state="disabled", width=20)
-entry_frecuencia_año.grid(row=3, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+            entry_frecuencia_est_mes_pasado["state"] = "normal"
+            entry_frecuencia_est_mes_pasado.delete(0, "end")
+            entry_frecuencia_est_mes_pasado.insert(0, f"{mes_pasado} | " + str(datos2[0][0]) + " | fi: " + str(datos2[0][1]))
+            entry_frecuencia_est_mes_pasado["state"] = "readonly"
+            
+        conexion1 = conectar_bd()
+        if conexion1:
+            try:
+                cursor = conexion1.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        COUNT(*) "FRECUENCIA",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "AÑO" = :año
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
+                    """,
+                    (año,),
+                )
+                datos3 = cursor.fetchall()
+                cursor.close()
+                
+                cerrar_bd(conexion1)
+                
+                if len(datos3) == 0:
+                    entry_frecuencia_est_promedio["state"] = "normal"
+                    entry_frecuencia_est_promedio.delete(0, "end")
+                    entry_frecuencia_est_promedio.insert(0, "—")
+                    entry_frecuencia_est_promedio["state"] = "readonly"
+                    
+                    entry_frecuencia_est_año["state"] = "normal"
+                    entry_frecuencia_est_año.delete(0, "end")
+                    entry_frecuencia_est_año.insert(0, "—")
+                    entry_frecuencia_est_año["state"] = "readonly"
+                else:
+                    promedio = datos3[0][1]/mes
+                    entry_frecuencia_est_promedio["state"] = "normal"
+                    entry_frecuencia_est_promedio.delete(0, "end")
+                    entry_frecuencia_est_promedio.insert(0, f"{año} | " + str(datos3[0][0]) + " | fi: " + str(round((promedio),2)) + "/mes")
+                    entry_frecuencia_est_promedio["state"] = "readonly"
+                    
+                    entry_frecuencia_est_año["state"] = "normal"
+                    entry_frecuencia_est_año.delete(0, "end")
+                    entry_frecuencia_est_año.insert(0, f"{año} | " + str(datos3[0][0]) + " |  fi: " + str(datos3[0][1]) + "/año")
+                    entry_frecuencia_est_año["state"] = "readonly"
+                
+            except Exception as ex:
+                cerrar_bd(conexion1)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+        
+        conexion2 = conectar_bd()
+        if conexion2:
+            try:
+                cursor = conexion2.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "MES" = :mes AND "AÑO" = :año
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "GASTO TOTAL" DESC
+                    """,
+                    (mes, año,),
+                )
+                datos_ = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion2)
+                
+            except Exception as ex:
+                cerrar_bd(conexion2)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                
+        conexion3 = conectar_bd()
+        if conexion3:
+            try:
+                cursor = conexion3.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "MES" = :mes_p AND "AÑO" = :año_pasado
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "GASTO TOTAL" DESC
+                    """,
+                    (mes_p, año_pasado,),
+                )
+                datos_p = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion3)
+                
+            except Exception as ex:
+                cerrar_bd(conexion3)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                
+        if len(datos_) == 0 and len(datos_p) == 0:
+            entry_mas_gastos_est["state"] = "normal"
+            entry_mas_gastos_est.delete(0, "end")
+            entry_mas_gastos_est.insert(0, "—")
+            entry_mas_gastos_est["state"] = "readonly"
+            
+            entry_mas_gastos_est_pasado["state"] = "normal"
+            entry_mas_gastos_est_pasado.delete(0, "end")
+            entry_mas_gastos_est_pasado.insert(0, "—")
+            entry_mas_gastos_est_pasado["state"] = "readonly"
+            
+        elif len(datos_) > 0 and len(datos_p) == 0:
+            entry_mas_gastos_est["state"] = "normal"
+            entry_mas_gastos_est.delete(0, "end")
+            entry_mas_gastos_est.insert(0, f"{mes_actual} | " + str(datos_[0][0]) + " | S/. " + str(round(datos_[0][1],2)))
+            entry_mas_gastos_est["state"] = "readonly"
+            
+            entry_mas_gastos_est_pasado["state"] = "normal"
+            entry_mas_gastos_est_pasado.delete(0, "end")
+            entry_mas_gastos_est_pasado.insert(0, "—")
+            entry_mas_gastos_est_pasado["state"] = "readonly"
+            
+        elif len(datos_) == 0 and len(datos_p) > 0:
+            entry_mas_gastos_est["state"] = "normal"
+            entry_mas_gastos_est.delete(0, "end")
+            entry_mas_gastos_est.insert(0, "—")
+            entry_mas_gastos_est["state"] = "readonly"
+            
+            entry_mas_gastos_est_pasado["state"] = "normal"
+            entry_mas_gastos_est_pasado.delete(0, "end")
+            entry_mas_gastos_est_pasado.insert(0, f"{mes_pasado} | " + str(datos_p[0][0]) + " | S/. " + str(round(datos_p[0][1],2)))
+            entry_mas_gastos_est_pasado["state"] = "readonly"
+            
+        elif len(datos_) > 0 and len(datos_p) > 0:
+            entry_mas_gastos_est["state"] = "normal"
+            entry_mas_gastos_est.delete(0, "end")
+            entry_mas_gastos_est.insert(0, f"{mes_actual} | " + str(datos_[0][0]) + " | S/. " + str(round(datos_[0][1],2)))
+            entry_mas_gastos_est["state"] = "readonly"
+            
+            entry_mas_gastos_est_pasado["state"] = "normal"
+            entry_mas_gastos_est_pasado.delete(0, "end")
+            entry_mas_gastos_est_pasado.insert(0, f"{mes_pasado} | " + str(datos_p[0][0]) + " | S/. " + str(round(datos_p[0][1],2)))
+            entry_mas_gastos_est_pasado["state"] = "readonly"
+            
+    else:
+        mes_pasado = meses[mes-1]
+        
+        conexion = conectar_bd()
+        if conexion:
+            mes_p = mes-1
+            try:
+                cursor = conexion.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        COUNT(*) "FRECUENCIA",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "MES" = :mes_p AND "AÑO" = :año
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
+                    """,
+                    (mes_p, año,),
+                )
+                datos2 = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion)
+                
+            except Exception as ex:
+                cerrar_bd(conexion)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                    
+        if len(datos1) == 0 and len(datos2) == 0:
+            entry_frecuencia_est["state"] = "normal"
+            entry_frecuencia_est.delete(0, "end")
+            entry_frecuencia_est.insert(0, "—")
+            entry_frecuencia_est["state"] = "readonly"
+            
+            entry_frecuencia_est_mes_pasado["state"] = "normal"
+            entry_frecuencia_est_mes_pasado.delete(0, "end")
+            entry_frecuencia_est_mes_pasado.insert(0, "—")
+            entry_frecuencia_est_mes_pasado["state"] = "readonly"
+            
+        elif len(datos1) > 0 and len(datos2) == 0:
+            entry_frecuencia_est["state"] = "normal"
+            entry_frecuencia_est.delete(0, "end")
+            entry_frecuencia_est.insert(0, f"{mes_actual} | " + str(datos1[0][0]) + " | fi: " + str(datos1[0][1]))
+            entry_frecuencia_est["state"] = "readonly"
 
-label_mas_gastos = ttk.Label(tab_4, text="+ Gastos Mes Actual:")
-label_mas_gastos.grid(row=4, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
-entry_mas_gastos = ttk.Entry(tab_4, state="disabled", width=20)
-entry_mas_gastos.grid(row=5, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+            entry_frecuencia_est_mes_pasado["state"] = "normal"
+            entry_frecuencia_est_mes_pasado.delete(0, "end")
+            entry_frecuencia_est_mes_pasado.insert(0, "—")
+            entry_frecuencia_est_mes_pasado["state"] = "readonly"
+            
+        elif len(datos1) == 0 and len(datos2) > 0:
+            entry_frecuencia_est["state"] = "normal"
+            entry_frecuencia_est.delete(0, "end")
+            entry_frecuencia_est.insert(0, "—")
+            entry_frecuencia_est["state"] = "readonly"
 
-label_mas_gastos_pasado = ttk.Label(tab_4, text="+ Gastos Mes Pasado:")
-label_mas_gastos_pasado.grid(row=4, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
-entry_mas_gastos_pasado = ttk.Entry(tab_4, state="disabled", width=20)
-entry_mas_gastos_pasado.grid(row=5, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+            entry_frecuencia_est_mes_pasado["state"] = "normal"
+            entry_frecuencia_est_mes_pasado.delete(0, "end")
+            entry_frecuencia_est_mes_pasado.insert(0, f"{mes_pasado} | " + str(datos2[0][0]) + " | fi: " + str(datos2[0][1]))
+            entry_frecuencia_est_mes_pasado["state"] = "readonly"
+            
+        elif len(datos1) > 0 and len(datos2) > 0:
+            entry_frecuencia_est["state"] = "normal"
+            entry_frecuencia_est.delete(0, "end")
+            entry_frecuencia_est.insert(0, f"{mes_actual} | " + str(datos1[0][0]) + " | fi: " + str(datos1[0][1]))
+            entry_frecuencia_est["state"] = "readonly"
+
+            entry_frecuencia_est_mes_pasado["state"] = "normal"
+            entry_frecuencia_est_mes_pasado.delete(0, "end")
+            entry_frecuencia_est_mes_pasado.insert(0, f"{mes_pasado} | " + str(datos2[0][0]) + " | fi: " + str(datos2[0][1]))
+            entry_frecuencia_est_mes_pasado["state"] = "readonly"
+                       
+        conexion1 = conectar_bd()
+        if conexion1:
+            try:
+                cursor = conexion1.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        COUNT(*) "FRECUENCIA",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "AÑO" = :año
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "FRECUENCIA" DESC, "GASTO TOTAL" DESC
+                    """,
+                    (año,),
+                )
+                datos3 = cursor.fetchall()
+                cursor.close()
+                
+                cerrar_bd(conexion1)
+                
+                if len(datos3) == 0:
+                    entry_frecuencia_est_promedio["state"] = "normal"
+                    entry_frecuencia_est_promedio.delete(0, "end")
+                    entry_frecuencia_est_promedio.insert(0, "—")
+                    entry_frecuencia_est_promedio["state"] = "readonly"
+                    
+                    entry_frecuencia_est_año["state"] = "normal"
+                    entry_frecuencia_est_año.delete(0, "end")
+                    entry_frecuencia_est_año.insert(0, "—")
+                    entry_frecuencia_est_año["state"] = "readonly"
+                else:
+                    promedio = datos3[0][1]/mes
+                    entry_frecuencia_est_promedio["state"] = "normal"
+                    entry_frecuencia_est_promedio.delete(0, "end")
+                    entry_frecuencia_est_promedio.insert(0, f"{año} | " + str(datos3[0][0]) + " | fi: " + str(round((promedio),2)) + "/mes")
+                    entry_frecuencia_est_promedio["state"] = "readonly"
+                    
+                    entry_frecuencia_est_año["state"] = "normal"
+                    entry_frecuencia_est_año.delete(0, "end")
+                    entry_frecuencia_est_año.insert(0, f"{año} | " + str(datos3[0][0]) + " |  fi: " + str(datos3[0][1]) + "/año")
+                    entry_frecuencia_est_año["state"] = "readonly"
+                
+            except Exception as ex:
+                cerrar_bd(conexion1)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+        
+        conexion2 = conectar_bd()
+        if conexion2:
+            try:
+                cursor = conexion2.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.FECHA) AS INTEGER) "MES",
+                        CAST(strftime('%Y', G.FECHA) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "MES" = :mes AND "AÑO" = :año
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "GASTO TOTAL" DESC
+                    """,
+                    (mes, año,),
+                )
+                datos_ = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion2)
+                
+            except Exception as ex:
+                cerrar_bd(conexion2)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                
+        conexion3 = conectar_bd()
+        if conexion3:
+            mes_p = mes-1
+            try:
+                cursor = conexion3.cursor()
+                cursor.execute(
+                    """
+                    SELECT
+                        E.NOMBRE_EST "ESTABLECIMIENTO",
+                        SUM(G.MONTO) "GASTO TOTAL",
+                        CAST(strftime('%m', G.fecha) AS INTEGER) "MES",
+                        CAST(strftime('%Y', G.fecha) AS INTEGER) "AÑO"
+                    FROM GASTOS G
+                    JOIN ESTABLECIMIENTOS E ON E.ESTABLECIMIENTO = G.ESTABLECIMIENTOS_ESTABLECIMIENTO
+                    WHERE "MES" = :mes_p AND "AÑO" = :año
+                    GROUP BY "ESTABLECIMIENTO"
+                    ORDER BY "GASTO TOTAL" DESC
+
+                    """,
+                    (mes_p, año,),
+                )
+                datos_p = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion3)
+                
+            except Exception as ex:
+                cerrar_bd(conexion3)
+                messagebox.showerror("Error", "Error al obtener datos: " + str(ex))
+                
+        if len(datos_) == 0 and len(datos_p) == 0:
+            entry_mas_gastos_est["state"] = "normal"
+            entry_mas_gastos_est.delete(0, "end")
+            entry_mas_gastos_est.insert(0, "—")
+            entry_mas_gastos_est["state"] = "readonly"
+            
+            entry_mas_gastos_est_pasado["state"] = "normal"
+            entry_mas_gastos_est_pasado.delete(0, "end")
+            entry_mas_gastos_est_pasado.insert(0, "—")
+            entry_mas_gastos_est_pasado["state"] = "readonly"
+            
+        elif len(datos_) > 0 and len(datos_p) == 0:
+            entry_mas_gastos_est["state"] = "normal"
+            entry_mas_gastos_est.delete(0, "end")
+            entry_mas_gastos_est.insert(0, f"{mes_actual} | " + str(datos_[0][0]) + " | S/. " + str(round(datos_[0][1],2)))
+            entry_mas_gastos_est["state"] = "readonly"
+            
+            entry_mas_gastos_est_pasado["state"] = "normal"
+            entry_mas_gastos_est_pasado.delete(0, "end")
+            entry_mas_gastos_est_pasado.insert(0, "—")
+            entry_mas_gastos_est_pasado["state"] = "readonly"
+            
+        elif len(datos_) == 0 and len(datos_p) > 0:
+            entry_mas_gastos_est["state"] = "normal"
+            entry_mas_gastos_est.delete(0, "end")
+            entry_mas_gastos_est.insert(0, "—")
+            entry_mas_gastos_est["state"] = "readonly"
+            
+            entry_mas_gastos_est_pasado["state"] = "normal"
+            entry_mas_gastos_est_pasado.delete(0, "end")
+            entry_mas_gastos_est_pasado.insert(0, f"{mes_pasado} | " + str(datos_p[0][0]) + " | S/. " + str(round(datos_p[0][1],2)))
+            entry_mas_gastos_est_pasado["state"] = "readonly"
+            
+        elif len(datos_) > 0 and len(datos_p) > 0:
+            entry_mas_gastos_est["state"] = "normal"
+            entry_mas_gastos_est.delete(0, "end")
+            entry_mas_gastos_est.insert(0, f"{mes_actual} | " + str(datos_[0][0]) + " | S/. " + str(round(datos_[0][1],2)))
+            entry_mas_gastos_est["state"] = "readonly"
+            
+            entry_mas_gastos_est_pasado["state"] = "normal"
+            entry_mas_gastos_est_pasado.delete(0, "end")
+            entry_mas_gastos_est_pasado.insert(0, f"{mes_pasado} | " + str(datos_p[0][0]) + " | S/. " + str(round(datos_p[0][1],2)))
+            entry_mas_gastos_est_pasado["state"] = "readonly"
+
+label_frecuencia_est = ttk.Label(tab_4, text="Frecuencia Mes Actual:")
+label_frecuencia_est.grid(row=0, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_est = ttk.Entry(tab_4, state="disabled", width=20)
+entry_frecuencia_est.grid(row=1, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+
+label_frecuencia_est_mes_pasado = ttk.Label(tab_4, text="Frecuencia Mes Pasado:")
+label_frecuencia_est_mes_pasado.grid(row=0, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
+entry_frecuencia_est_mes_pasado = ttk.Entry(tab_4, state="disabled", width=20)
+entry_frecuencia_est_mes_pasado.grid(row=1, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+
+label_frecuencia_est_promedio = ttk.Label(tab_4, text="Frecuencia Mes Promedio:")
+label_frecuencia_est_promedio.grid(row=2, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
+entry_frecuencia_est_promedio = ttk.Entry(tab_4, state="disabled", width=20)
+entry_frecuencia_est_promedio.grid(row=3, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+
+label_frecuencia_est_año = ttk.Label(tab_4, text="Frecuencia Año Actual:")
+label_frecuencia_est_año.grid(row=2, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
+entry_frecuencia_est_año = ttk.Entry(tab_4, state="disabled", width=20)
+entry_frecuencia_est_año.grid(row=3, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
+
+label_mas_gastos_est = ttk.Label(tab_4, text="+ Gastos Mes Actual:")
+label_mas_gastos_est.grid(row=4, column=0, padx=(15, 0), pady=(5, 0), sticky="nsew")
+entry_mas_gastos_est = ttk.Entry(tab_4, state="disabled", width=20)
+entry_mas_gastos_est.grid(row=5, column=0, padx=(15, 0), pady=(0, 5), sticky="nsew")
+
+label_mas_gastos_est_pasado = ttk.Label(tab_4, text="+ Gastos Mes Pasado:")
+label_mas_gastos_est_pasado.grid(row=4, column=1, padx=(20, 15), pady=(5, 0), sticky="nsew")
+entry_mas_gastos_est_pasado = ttk.Entry(tab_4, state="disabled", width=20)
+entry_mas_gastos_est_pasado.grid(row=5, column=1, padx=(20, 15), pady=(0, 5), sticky="nsew")
 
 notebook.pack(expand=True, fill="both", padx=5, pady=0)
 
