@@ -3226,15 +3226,7 @@ def generar_excel():
     if not datos:  # Verifica si la lista de datos está vacía
         messagebox.showinfo("Generar Excel", "ERROR: No se encontraron datos para generar el archivo Excel.")
         return
-    
-    fila_extra = []
-    if entry_inicio.get() != "01-01-2000":
-        fila_extra = ["Inicio de ciclo:", entry_inicio.get(),
-                      "Cierre de ciclo:", entry_cierre.get(),
-                      "Fecha de pago:", entry_pago.get(),
-                      "Pago total:", entry_total.get()]
-        datos.insert(0, fila_extra)
-        
+            
     df = pd.DataFrame(datos, columns=encabezados)
     df["Monto"] = pd.to_numeric(df["Monto"].str.replace(",", "."), errors="coerce")
     df["Fecha"] = pd.to_datetime(df["Fecha"], format="%d-%m-%y", errors="coerce")
