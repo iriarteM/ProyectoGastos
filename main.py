@@ -1,9 +1,17 @@
 import tkinter as tk
+import pandas as pd
+import openpyxl
+import locale
+import os
 from conexion import *
 from tkinter import ttk
 from tkinter import messagebox
 from tkcalendar import DateEntry
 from datetime import datetime
+from tkinter.filedialog import asksaveasfilename
+from openpyxl.styles import NamedStyle
+from openpyxl.utils import get_column_letter
+
 
 # FUNCIONES #
 def center_window(window):
@@ -852,6 +860,7 @@ def tree():
     )
     scroll_tabla = ttk.Scrollbar(frame_tabla)
     scroll_tabla.pack(side="right", fill="y")
+    global encabezados 
     encabezados = (
         "Id",
         "Usuario",
@@ -3209,9 +3218,107 @@ label_promedio.grid(row=4, column=0, padx=(15, 15), pady=(5, 0), sticky="nsew")
 entry_promedio = ttk.Entry(frame_facturacion, state="disabled", width=10)
 entry_promedio.grid(row=5, column=0, padx=(15, 15), pady=(0, 15), sticky="nsew")
 
-
-boton_generar_reporte = ttk.Button(frame_facturacion, text="Excel")
-boton_generar_reporte.grid(row=5, column=1, padx=(0, 15), pady=(0, 15), sticky="n")
+def generar_excel():
+    datos = []
+    for item in treeview.get_children():
+        datos.append(treeview.item(item)["values"])
+        
+    if not datos:  # Verifica si la lista de datos está vacía
+        messagebox.showinfo("Generar Excel", "ERROR: No se encontraron datos para generar el archivo Excel.")
+        return
+    
+    fila_extra = []
+    if entry_inicio.get() != "01-01-2000":
+        fila_extra = ["Inicio de ciclo:", entry_inicio.get(),
+                      "Cierre de ciclo:", entry_cierre.get(),
+                      "Fecha de pago:", entry_pago.get(),
+                      "Pago total:", entry_total.get()]
+        datos.insert(0, fila_extra)
+        
+    df = pd.DataFrame(datos, columns=encabezados)
+    df["Monto"] = pd.to_numeric(df["Monto"].str.replace(",", "."), errors="coerce")
+    df["Fecha"] = pd.to_datetime(df["Fecha"], format="%d-%m-%y", errors="coerce")
+    df["Fecha Pago"] = pd.to_datetime(df["Fecha Pago"], format="%d-%m-%y", errors="coerce")
+    
+    # Abre un diálogo para seleccionar la ubicación y el nombre del archivo Excel
+    archivo_excel = asksaveasfilename(defaultextension=".xlsx", filetypes=[("Archivos de Excel", "*.xlsx")])
+    
+    if archivo_excel:
+        df.to_excel(archivo_excel, index=False)
+        
+        # Abre el archivo Excel con openpyxl
+        wb = openpyxl.load_workbook(archivo_excel)
+        ws = wb.active
+        
+        # Obtiene el número de filas y columnas
+        num_filas = ws.max_row
+        num_columnas = ws.max_column
+        
+        # Aplica formato de tabla a la hoja de Excel
+        tab = openpyxl.worksheet.table.Table(displayName="TablaDatos", ref=ws.dimensions)
+        style_range = openpyxl.worksheet.table.TableStyleInfo(
+            name="TableStyleMedium9", showFirstColumn=False,
+            showLastColumn=False, showRowStripes=True, showColumnStripes=True)
+        tab.tableStyleInfo = style_range
+        ws.add_table(tab)
+        
+        # Agrega la suma de la columna "Monto"
+        ws.cell(row=num_filas + 1, column=encabezados.index("Monto"), value="Total:")
+        ws.cell(row=num_filas + 1, column=encabezados.index("Monto") + 1, value=f"=SUM({openpyxl.utils.get_column_letter(encabezados.index('Monto') + 1)}2:{openpyxl.utils.get_column_letter(encabezados.index('Monto') + 1)}{num_filas})")
+        
+        # Aplica formato de moneda a la celda de la suma
+        locale.setlocale(locale.LC_ALL, "")  # Configura localización para el formato de moneda
+        style = NamedStyle(name="currency", number_format='"S/ "#,##0.00')
+        ws.cell(row=num_filas + 1, column=encabezados.index("Monto") + 1).style = style
+        
+        # Aplica estilo en negrita a las celdas
+        for row in ws.iter_rows(min_row=num_filas + 1, max_row=num_filas + 1, min_col=encabezados.index("Monto"), max_col=encabezados.index("Monto") + 1):
+            for cell in row:
+                cell.font = openpyxl.styles.Font(bold=True)
+                
+        # Aplica formato de fecha a las columnas "Fecha" y "Fecha Pago"
+        date_style = openpyxl.styles.NamedStyle(name="date_style", number_format="DD/MM/YYYY")
+        for col_name in ["Fecha", "Fecha Pago"]:
+            for row in ws.iter_rows(min_row=2, max_row=num_filas, min_col=encabezados.index(col_name) + 1, max_col=encabezados.index(col_name) + 1):
+                for cell in row:
+                    cell.style = date_style
+                    
+        wb.save(archivo_excel)
+        
+        # Abre el archivo Excel en modo de edición con openpyxl
+        wb = openpyxl.load_workbook(archivo_excel)
+        ws = wb.active
+        
+        # Ajusta el ancho de las columnas al tamaño del valor más largo en cada columna
+        for col_idx in range(1, num_columnas + 1):
+            col_letra = get_column_letter(col_idx)
+            
+            # Determina el ancho según el tipo de columna
+            if col_letra in ["C"]:  # Columna "Fecha"
+                encabezado_ancho = len(ws.cell(row=1, column=col_idx).value)
+                ancho = encabezado_ancho + 7
+            elif col_letra in ["I"]:  # Columna "Fecha Pago"
+                encabezado_ancho = len(ws.cell(row=1, column=col_idx).value)
+                ancho = encabezado_ancho + 2
+            else:
+                max_longitud = max(len(str(ws.cell(row=row_idx, column=col_idx).value)) for row_idx in range(2, num_filas + 1))
+                ancho = max_longitud + 5  # Agrega un pequeño espacio adicional
+                
+            ws.column_dimensions[col_letra].width = ancho
+            
+        # Guarda el archivo Excel con los cambios de ajuste de ancho
+        wb.save(archivo_excel)
+        
+        # Cierra el archivo Excel
+        wb.close()
+        
+        messagebox.showinfo("Generar Excel", f"El archivo Excel se generó correctamente.\nUbicación: {archivo_excel}")
+        
+        # Abre automáticamente el archivo Excel
+        os.system(f"start excel {archivo_excel}")
+        
+boton_generar_reporte = ttk.Button(frame_facturacion, text="Generar\n  Excel", command=generar_excel)
+boton_generar_reporte.grid(row=4, rowspan=2, column=1, padx=(0, 15), pady=(0, 15), sticky="nsew")
 
 
 # FRAME CONFIGURACIÓN #
