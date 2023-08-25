@@ -46,6 +46,7 @@ def actualizar():
     reporte_usuarios()
     reporte_bancos()
     reporte_establecimientos()
+    actualizar_usuarios_filtro()
     
     consulta = """
         SELECT
@@ -253,10 +254,9 @@ def registrar_gasto():
     if usuario == "Seleccionar" or establecimiento == "Seleccionar" or monto == "" or tarjetas_nro_tarjeta == "Seleccionar" or banco == "Seleccionar":
         messagebox.showwarning("Error de registro", "ERROR: FALTAN COMPLETAR ESPACIOS OBLIGATORIOS.")
         return
-    elif float(monto) <= 0:
-        messagebox.showwarning("Error de registro", "ERROR: El monto debe ser mayor a  0.0.")
+    elif monto.replace(".", "", 1).isdigit() == False or float(monto) <= 0:
+        messagebox.showwarning("Error de registro", "ERROR: El monto debe ser un valor numérico mayor a  0.0.")
         return
-    
     else:
         id = generar_id_gasto()
         usuarios_usuario = obtener_usuario_id()
@@ -347,7 +347,7 @@ def editar_gasto_seleccionado(seleccion):
     fecha_formateada = fecha_obj.strftime("%Y-%m-%d")
     
     detalle = str(entry_detalle.get())
-    monto = float(entry_monto.get())
+    monto = entry_monto.get()
     usuarios_usuario = obtener_usuario_id()
     tarjetas_nro_tarjeta = str(selected_nro_tarjeta.get())
     establecimientos_establecimiento = obtener_establecimiento_id()
@@ -355,7 +355,7 @@ def editar_gasto_seleccionado(seleccion):
     if str(monto) == "" or tarjetas_nro_tarjeta == "Seleccionar" :
         messagebox.showwarning("Error de registro", "ERROR: FALTAN COMPLETAR ESPACIOS OBLIGATORIOS.")
         return
-    elif monto <= 0:
+    elif monto.replace(".", "", 1).isdigit() == False or float(monto) <= 0:
         messagebox.showwarning("Error de registro", "ERROR: El monto debe ser mayor a  0.0.")
         return
     
@@ -3378,8 +3378,30 @@ def ventana_usuarios(parent_style):
     
     def registrar_usuario():
         usuario = entry_user.get()
+        
+        conexion = conectar_bd()
+        if conexion:
+            try:
+                cursor = conexion.cursor()
+                cursor.execute("""SELECT * FROM USUARIOS""")
+                datos = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion)
+                
+                for fila in datos:
+                    if fila[1] == usuario:
+                        messagebox.showerror("Error", "Ya existe un usuario con ese nombre")
+                        return
+                    
+            except Exception as ex:
+                cerrar_bd(conexion)
+                messagebox.showerror("Error", "Error obtener usuarios: " + str(ex))
+                
         if usuario == "":
             messagebox.showwarning("Error de registro", "ERROR: FALTAN COMPLETAR ESPACIOS OBLIGATORIOS.")
+            return
+        elif not any(c.isalpha() for c in usuario):
+            messagebox.showwarning("Error de registro", "ERROR: El nombre debe tener letras.")
             return
         else:
             id = generar_id_usuario()
@@ -3422,7 +3444,32 @@ def ventana_usuarios(parent_style):
     def editar_usuario_seleccionado(seleccion):
         item_values = treeview_usuarios.item(seleccion, "values")
         id = item_values[0]
+        
         usuario = entry_user.get()
+        conexion = conectar_bd()
+        if conexion:
+            try:
+                cursor = conexion.cursor()
+                cursor.execute("""SELECT * FROM USUARIOS""")
+                datos = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion)
+                
+                for fila in datos:
+                    if fila[1] == usuario:
+                        messagebox.showerror("Error", "Ya existe un usuario con ese nombre")
+                        return
+                    
+            except Exception as ex:
+                cerrar_bd(conexion)
+                messagebox.showerror("Error", "Error obtener usuarios: " + str(ex))
+                
+        if usuario == "":
+            messagebox.showwarning("Error de registro", "ERROR: FALTAN COMPLETAR ESPACIOS OBLIGATORIOS.")
+            return
+        elif not any(c.isalpha() for c in usuario):
+            messagebox.showwarning("Error de registro", "ERROR: El nombre debe tener letras.")
+            return
         
         conexion = conectar_bd()
         if conexion:
@@ -3621,12 +3668,33 @@ def ventana_bancos(parent_style):
     
     def registrar_banco():
         banco = entry_bank.get()
+        
+        conexion = conectar_bd()
+        if conexion:
+            try:
+                cursor = conexion.cursor()
+                cursor.execute("""SELECT * FROM BANCOS""")
+                datos = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion)
+                
+                for fila in datos:
+                    if fila[1] == banco:
+                        messagebox.showerror("Error", "Ya existe un banco con ese nombre")
+                        return
+                    
+            except Exception as ex:
+                cerrar_bd(conexion)
+                messagebox.showerror("Error", "Error obtener bancos: " + str(ex))
+                
         if banco == "":
             messagebox.showwarning("Error de registro", "ERROR: FALTAN COMPLETAR ESPACIOS OBLIGATORIOS.")
             return
+        elif not any(c.isalpha() for c in banco):
+            messagebox.showwarning("Error de registro", "ERROR: El nombre debe tener letras.")
+            return
         else:
             id = generar_id_banco()
-        
             conexion = conectar_bd()
             if conexion:
                 try:
@@ -3667,6 +3735,30 @@ def ventana_bancos(parent_style):
         id = item_values[0]
         banco = entry_bank.get()
         
+        conexion = conectar_bd()
+        if conexion:
+            try:
+                cursor = conexion.cursor()
+                cursor.execute("""SELECT * FROM BANCOS""")
+                datos = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion)
+                
+                for fila in datos:
+                    if fila[1] == banco:
+                        messagebox.showerror("Error", "Ya existe un banco con ese nombre")
+                        return
+                    
+            except Exception as ex:
+                cerrar_bd(conexion)
+                messagebox.showerror("Error", "Error obtener bancos: " + str(ex))
+        if banco == "":
+            messagebox.showwarning("Error de registro", "ERROR: FALTAN COMPLETAR ESPACIOS OBLIGATORIOS.")
+            return
+        elif not any(c.isalpha() for c in banco):
+            messagebox.showwarning("Error de registro", "ERROR: El nombre debe tener letras.")
+            return
+           
         conexion = conectar_bd()
         if conexion:
             try:
@@ -3720,7 +3812,7 @@ def ventana_bancos(parent_style):
                         WHERE B.BANCO = :id
                     )
                     """, 
-                    (id)
+                    (id,)
                 )
                 conexion.commit()
                 cursor.close()
@@ -3730,7 +3822,7 @@ def ventana_bancos(parent_style):
                     """
                     DELETE FROM TARJETAS WHERE BANCOS_BANCO = :id
                     """, 
-                    (id)
+                    (id,)
                 )
                 conexion.commit()
                 cursor.close()
@@ -3740,7 +3832,7 @@ def ventana_bancos(parent_style):
                     """
                     DELETE FROM BANCOS WHERE BANCO = :id
                     """, 
-                    (id)
+                    (id,)
                 )
                 conexion.commit()
                 cursor.close()
@@ -3866,8 +3958,30 @@ def ventana_establecimientos(parent_style):
             
     def registrar_establecimiento():
         establecimiento = entry_estab.get()
+        
+        conexion = conectar_bd()
+        if conexion:
+            try:
+                cursor = conexion.cursor()
+                cursor.execute("""SELECT * FROM ESTABLECIMIENTOS""")
+                datos = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion)
+                
+                for fila in datos:
+                    if fila[1] == establecimiento:
+                        messagebox.showerror("Error", "Ya existe un establecimiento con ese nombre")
+                        return
+                    
+            except Exception as ex:
+                cerrar_bd(conexion)
+                messagebox.showerror("Error", "Error obtener establecimientos: " + str(ex))
+                
         if establecimiento == "":
             messagebox.showwarning("Error de registro", "ERROR: FALTAN COMPLETAR ESPACIOS OBLIGATORIOS.")
+            return
+        elif not any(c.isalpha() for c in establecimiento):
+            messagebox.showwarning("Error de registro", "ERROR: El nombre debe tener letras.")
             return
         else:
             id = generar_id_establecimiento()
@@ -3910,7 +4024,32 @@ def ventana_establecimientos(parent_style):
     def editar_establecimiento_seleccionado(seleccion):
         item_values = treeview_establecimientos.item(seleccion, "values")
         id = item_values[0]
+        
         establecimiento = entry_estab.get()
+        conexion = conectar_bd()
+        if conexion:
+            try:
+                cursor = conexion.cursor()
+                cursor.execute("""SELECT * FROM ESTABLECIMIENTOS""")
+                datos = cursor.fetchall()
+                cursor.close()
+                cerrar_bd(conexion)
+                
+                for fila in datos:
+                    if fila[1] == establecimiento:
+                        messagebox.showerror("Error", "Ya existe un establecimiento con ese nombre")
+                        return
+                    
+            except Exception as ex:
+                cerrar_bd(conexion)
+                messagebox.showerror("Error", "Error obtener establecimientos: " + str(ex))
+                
+        if establecimiento == "":
+            messagebox.showwarning("Error de registro", "ERROR: FALTAN COMPLETAR ESPACIOS OBLIGATORIOS.")
+            return
+        elif not any(c.isalpha() for c in establecimiento):
+            messagebox.showwarning("Error de registro", "ERROR: El nombre debe tener letras.")
+            return
         
         conexion = conectar_bd()
         if conexion:
@@ -4175,10 +4314,10 @@ def ventana_tarjetas(parent_style):
         elif vencimiento.count('.') == 1 and all(char.isdigit() or char == '.' for char in vencimiento):
             messagebox.showwarning("Error de registro", "ERROR: El día de vencimiento debe ser un número entero.")
             return
-        elif int(cierre)>27 or int(cierre) <=0:
+        elif cierre.isdigit() == False or int(cierre)>27 or int(cierre) <=0:
             messagebox.showwarning("Error de registro", "ERROR: El cierre de facturación debe estar entre 1 y 27.")
             return
-        elif int(vencimiento)>27 or int(vencimiento) <=0:
+        elif vencimiento.isdigit() == False or int(vencimiento)>27 or int(vencimiento) <=0:
             messagebox.showwarning("Error de registro", "ERROR: El día de vencimiento debe estar entre 1 y 27.")
             return
         else:
