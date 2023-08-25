@@ -151,11 +151,21 @@ def switch_callback():
         actualizar()
         
 def obtener_fecha(event):
+    fecha_hoy = datetime.now().date()
+    fecha_formateada = fecha_hoy.strftime("%d-%m-%Y")
     fecha_seleccionada = entry_fecha.get_date()
-    entry_fecha["state"] = "readonly"
-    entry_fecha.delete(0, "end")
-    entry_fecha.insert("end", fecha_seleccionada)
-    entry_fecha["state"] = "readonly"
+    
+    if fecha_seleccionada > fecha_hoy:
+        entry_fecha["state"] = "normal"
+        entry_fecha.delete(0, "end")
+        entry_fecha.insert("end", fecha_formateada)
+        entry_fecha["state"] = "readonly"
+        messagebox.showwarning("Fecha", "ERROR: Fecha fuera de rango.")
+    else:
+        entry_fecha["state"] = "readonly"
+        entry_fecha.delete(0, "end")
+        entry_fecha.insert("end", fecha_seleccionada)
+        entry_fecha["state"] = "readonly"
 
 def generar_id_gasto():
     consulta = """ SELECT MAX(ID) FROM GASTOS"""
@@ -238,8 +248,8 @@ def registrar_gasto():
     monto = entry_monto.get()
     tarjetas_nro_tarjeta = str(combobox_nro_tarjeta.get())
     banco = combobox_bancos.get()
-    
     fecha = entry_fecha.get()
+    
     if usuario == "Seleccionar" or establecimiento == "Seleccionar" or monto == "" or tarjetas_nro_tarjeta == "Seleccionar" or banco == "Seleccionar":
         messagebox.showwarning("Error de registro", "ERROR: FALTAN COMPLETAR ESPACIOS OBLIGATORIOS.")
         return
@@ -1149,10 +1159,15 @@ def actualizar_dia_filtro(event):
                     años = cursor.fetchall()
                     cursor.close()
                     cerrar_bd(conexion)
-
-                    opciones_años = [año[0] for año in años]
-                    combobox_año["values"] = opciones_años
-                    combobox_año.set(opciones_años[0])
+                    
+                    if años == []:
+                        messagebox.showwarning("Error", "No se encontraron datos")
+                        combobox_mes.insert(0, "01")
+                        combobox_mes["state"] = "disabled"
+                    else:
+                        opciones_años = [año[0] for año in años]
+                        combobox_año["values"] = opciones_años
+                        combobox_año.set(opciones_años[0])
 
                 except Exception as ex:
                     cerrar_bd(conexion)
@@ -3569,6 +3584,7 @@ def ventana_usuarios(parent_style):
         root.grab_set()
         actualizar_usuarios()
         actualizar_usuarios_filtro()
+        #agregar
         actualizar()
         
     ventana_usuarios.protocol("WM_DELETE_WINDOW", cerrar_ventana_usuarios)
