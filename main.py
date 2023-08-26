@@ -46,7 +46,6 @@ def actualizar():
     reporte_usuarios()
     reporte_bancos()
     reporte_establecimientos()
-    actualizar_usuarios_filtro()
     
     consulta = """
         SELECT
@@ -892,15 +891,15 @@ def tree():
         height=13,
     )
     treeview.column("Id", width=5)
-    treeview.column("Usuario", width=40)
+    treeview.column("Usuario", width=45)
     treeview.column("Fecha", width=65)
     treeview.column("Lugar", width=90)
-    treeview.column("Detalle", width=130)
+    treeview.column("Detalle", width=110)
     treeview.column("Banco", width=110)
-    treeview.column("Nro", width=35)
+    treeview.column("Nro", width=40)
     treeview.column("Tipo", width=60)
-    treeview.column("Fecha Pago", width=65)
-    treeview.column("Monto", width=55)
+    treeview.column("Fecha Pago", width=70)
+    treeview.column("Monto", width=60)
 
     for encabezado in encabezados:
         treeview.heading(encabezado, text=encabezado)
@@ -4374,8 +4373,7 @@ def ventana_tarjetas(parent_style):
             tipo = "Adicional"
         cierre = entry_cierre.get()
         vencimiento = entry_venci.get()
-        usuarios_usuario = obtener_user_id()
-        bancos_banco = obtener_banco_id()
+        
         
         if nueva_tarjeta == "" or cierre == "" or vencimiento == "":
             messagebox.showwarning("Error de registro", "ERROR: FALTAN COMPLETAR ESPACIOS OBLIGATORIOS.")
@@ -4389,12 +4387,15 @@ def ventana_tarjetas(parent_style):
         elif vencimiento.count('.') == 1 and all(char.isdigit() or char == '.' for char in vencimiento):
             messagebox.showwarning("Error de registro", "ERROR: El día de vencimiento debe ser un número entero.")
             return
-        elif int(cierre)>27 or int(cierre) <=0:
+        elif cierre.isdigit() == False or int(cierre)>27 or int(cierre) <=0:
             messagebox.showwarning("Error de registro", "ERROR: El cierre de facturación debe estar entre 1 y 27.")
             return
-        elif int(vencimiento)>27 or int(vencimiento) <=0:
+        elif vencimiento.isdigit() == False or int(vencimiento)>27 or int(vencimiento) <=0:
             messagebox.showwarning("Error de registro", "ERROR: El día de vencimiento debe estar entre 1 y 27.")
             return
+        else:
+            usuarios_usuario = obtener_user_id()
+            bancos_banco = obtener_banco_id()
             
         conexion = conectar_bd()
         if conexion:
