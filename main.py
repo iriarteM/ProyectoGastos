@@ -1166,6 +1166,7 @@ def actualizar_dia_filtro(event):
                         combobox_mes["state"] = "disabled"
                     else:
                         opciones_años = [año[0] for año in años]
+                        opciones_años.insert(0,(int(años[0][0]) + 1))
                         combobox_año["values"] = opciones_años
                         combobox_año.set(opciones_años[0])
 
