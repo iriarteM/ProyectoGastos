@@ -624,8 +624,8 @@ root.title("GESTIÓN DE GASTOS")
 #root.resizable(0, 0)
 
 # IMPORTAR TCL
-root.tk.call("source", "scr/forest-dark.tcl")
-root.tk.call("source", "scr/forest-light.tcl")
+root.tk.call("source", "themes/forest-dark.tcl")
+root.tk.call("source", "themes/forest-light.tcl")
 style.theme_use("forest-light")
 
 # FRAMES #
